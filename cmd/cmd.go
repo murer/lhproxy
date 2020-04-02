@@ -47,11 +47,12 @@ func configClient() {
 	rootCmd.AddCommand(clientCmd)
 
 	clientCmd.AddCommand(&cobra.Command{
-		Use: "pipe <host>:<port>",
+		Use: "pipe <lhproxy:port> <host>:<port>",
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pipe := &client.Pipe{
-				RAddress: args[0],
+				RAddress: args[1],
+				LHAddress: args[0],
 				LReader: os.Stdin,
 				LWriter: os.Stdout,
 			}

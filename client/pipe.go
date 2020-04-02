@@ -8,6 +8,7 @@ import (
 type Pipe struct {
 
   RAddress string
+  LHAddress string
 
   LWriter io.Writer
   LReader io.Reader
