@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"runtime"
 	"github.com/spf13/cobra"
 	. "github.com/murer/lhproxy/util"
@@ -10,10 +11,17 @@ var rootCmd *cobra.Command
 
 func Config() {
 	rootCmd = &cobra.Command{
-		Use:     "lhproxy",
-		Short:   "Last Hope Proxy",
-		Version: "lhproxy " + runtime.GOOS + "-" + runtime.GOARCH + ":" + Version,
+		Use: "lhproxy", Short: "Last Hope Proxy",
+		Version: fmt.Sprintf("%s-%s:%s", runtime.GOOS, runtime.GOARCH, Version),
 	}
+
+	rootCmd.AddCommand(&cobra.Command{
+		Use: "version",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			fmt.Printf(rootCmd.Version)
+			return nil
+		},
+	})
 }
 
 func Execute() {
