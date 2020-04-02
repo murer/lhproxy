@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"runtime"
 	"github.com/spf13/cobra"
 
@@ -42,10 +43,19 @@ func configServer() {
 }
 
 func configClient() {
-	rootCmd.AddCommand(&cobra.Command{
-		Use: "client",
+	clientCmd := &cobra.Command{Use:"client"}
+	rootCmd.AddCommand(clientCmd)
+
+	clientCmd.AddCommand(&cobra.Command{
+		Use: "pipe <host>:<port>",
+		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			client.ExecuteStd()
+			pipe := &client.Pipe{
+				RAddress: args[0],
+				LReader: os.Stdin,
+				LWriter: os.Stdout,
+			}
+			pipe.Execute()
 			return nil
 		},
 	})
