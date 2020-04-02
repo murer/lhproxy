@@ -5,6 +5,7 @@ import (
 	"runtime"
 	"github.com/spf13/cobra"
 
+	"github.com/murer/lhproxy/client"
 	"github.com/murer/lhproxy/server"
 
 	"github.com/murer/lhproxy/util"
@@ -27,6 +28,7 @@ func Config() {
 	})
 
 	configServer()
+	configClient()
 }
 
 func configServer() {
@@ -34,6 +36,16 @@ func configServer() {
 		Use: "server",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			server.Start()
+			return nil
+		},
+	})
+}
+
+func configClient() {
+	rootCmd.AddCommand(&cobra.Command{
+		Use: "client",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			client.ExecuteStd()
 			return nil
 		},
 	})
