@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"runtime"
 	"github.com/spf13/cobra"
+
+	"github.com/murer/lhproxy/server"
+
 	. "github.com/murer/lhproxy/util"
 )
 
@@ -19,6 +22,18 @@ func Config() {
 		Use: "version",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Printf(rootCmd.Version)
+			return nil
+		},
+	})
+
+	configServer()
+}
+
+func configServer() {
+	rootCmd.AddCommand(&cobra.Command{
+		Use: "server",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			server.Start()
 			return nil
 		},
 	})
