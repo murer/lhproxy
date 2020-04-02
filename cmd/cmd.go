@@ -7,7 +7,7 @@ import (
 
 	"github.com/murer/lhproxy/server"
 
-	. "github.com/murer/lhproxy/util"
+	"github.com/murer/lhproxy/util"
 )
 
 var rootCmd *cobra.Command
@@ -15,7 +15,7 @@ var rootCmd *cobra.Command
 func Config() {
 	rootCmd = &cobra.Command{
 		Use: "lhproxy", Short: "Last Hope Proxy",
-		Version: fmt.Sprintf("%s-%s:%s", runtime.GOOS, runtime.GOARCH, Version),
+		Version: fmt.Sprintf("%s-%s:%s", runtime.GOOS, runtime.GOARCH, util.Version),
 	}
 
 	rootCmd.AddCommand(&cobra.Command{
@@ -41,5 +41,5 @@ func configServer() {
 
 func Execute() {
 	err := rootCmd.Execute()
-	Check(err)
+	util.Check(err)
 }

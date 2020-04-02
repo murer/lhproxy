@@ -5,6 +5,7 @@ cmd_golang() {
   docker run -it --rm --label lhproxy_dev \
     --mount source=lhproxy_golang_dev,target=/go \
     -v "$(pwd)":/go/src -w /go/src \
+    -p 8080:8080 \
     golang:1.14 "$@"
 }
 
