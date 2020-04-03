@@ -5,6 +5,7 @@ import (
 	"net"
 	"fmt"
 	"strings"
+	"time"
 	"io"
 
 	"github.com/murer/lhproxy/util"
@@ -87,6 +88,7 @@ func (l *listenerWrapper) startAccepts() {
 			conn: conn,
 			reader: queue.New(BUFFER_SIZE),
 			eof: false,
+			lastUsed: time.Now().Unix(),
 		}
 		log.Printf("Caching accepted conn: %s", c.id)
 		go c.startReading()
@@ -106,6 +108,7 @@ func (scks *NativeSockets) Listen(addr string) string {
 		ln: ln,
 		id: fmt.Sprintf("listen://%s", ln.Addr().String()),
 		queue: queue.New(1),
+		lastUsed: time.Now().Unix(),
 	}
 	go l.startAccepts()
 	lns[l.id] = l
@@ -115,6 +118,7 @@ func (scks *NativeSockets) Listen(addr string) string {
 
 func (scks *NativeSockets) Accept(name string) string {
 	l := lns[name]
+	l.lastUsed = time.Now().Unix()
 	log.Printf("Accepting %s", l.id)
 	conn := l.accept()
 	if conn == nil {
@@ -134,6 +138,7 @@ func (scks *NativeSockets) Connect(addr string) string {
 		conn: conn,
 		reader: queue.New(BUFFER_SIZE),
 		eof: false,
+		lastUsed: time.Now().Unix(),
 	}
 	conns[c.id] = c
 	go c.startReading()
@@ -158,6 +163,7 @@ func (scks *NativeSockets) Close(id string) {
 
 func (scks *NativeSockets) Read(id string, max int) []byte {
 	c := conns[id]
+	c.lastUsed = time.Now().Unix()
 	if c.eof {
 		return nil
 	}
@@ -184,6 +190,7 @@ func (scks *NativeSockets) Read(id string, max int) []byte {
 
 func (scks *NativeSockets) Write(id string, data []byte) {
 	c := conns[id]
+	c.lastUsed = time.Now().Unix()
 	log.Printf("Write %s: %d", c.id, len(data))
 	n, err := c.conn.Write(data)
 	util.Check(err)
