@@ -24,4 +24,6 @@ func TestSockets(t *testing.T) {
 	cs := scks.Accept(listen)
 	assert.NotEmpty(t, cs)
 	defer scks.Close(cs)
+
+	scks.Read(cs)
 }

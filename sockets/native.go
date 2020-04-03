@@ -79,7 +79,7 @@ var native = &NativeSockets{
 
 }
 
-func (scks NativeSockets) Listen(addr string) string {
+func (scks *NativeSockets) Listen(addr string) string {
 	ln, err := net.Listen("tcp", addr)
 	util.Check(err)
 	l := &listenerWrapper{
@@ -93,7 +93,7 @@ func (scks NativeSockets) Listen(addr string) string {
 	return l.id
 }
 
-func (scks NativeSockets) Accept(name string) string {
+func (scks *NativeSockets) Accept(name string) string {
 	l := lns[name]
 	log.Printf("Accepting %s", l.id)
 	conn := l.accept()
@@ -107,7 +107,7 @@ func (scks NativeSockets) Accept(name string) string {
 	return conn.id
 }
 
-func (scks NativeSockets) Connect(addr string) string {
+func (scks *NativeSockets) Connect(addr string) string {
 	conn, err := net.Dial("tcp", addr)
 	util.Check(err)
 	c := &connWrapper{
@@ -119,7 +119,7 @@ func (scks NativeSockets) Connect(addr string) string {
 	return c.id
 }
 
-func (scks NativeSockets) Close(id string) {
+func (scks *NativeSockets) Close(id string) {
 	l := lns[id]
 	if l != nil {
 		log.Printf("Closing listen %s", l.id)
@@ -132,6 +132,10 @@ func (scks NativeSockets) Close(id string) {
 		delete(conns, c.id)
 		c.Close()
 	}
+}
+
+func (scks *NativeSockets) Read(id string) {
+
 }
 
 func GetNative() *NativeSockets {
