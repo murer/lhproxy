@@ -8,13 +8,13 @@ import (
 	"github.com/murer/lhproxy/util"
 )
 
-type listener struct {
+type listenerWrapper struct {
 	ln net.Listener
 	id string
 	conn net.Conn
 }
 
-func (l listener) nextConn() {
+func (l listenerWrapper) nextConn() {
 	if l.conn != nil {
 		log.Panicf("there already is a connection")
 	}
@@ -25,14 +25,14 @@ func (l listener) nextConn() {
 	l.conn = conn
 }
 
-func (l listener) accept() net.Conn {
+func (l listenerWrapper) accept() net.Conn {
 	if l.conn == nil {
 		return l.conn
 	}
 	return nil
 }
 
-var lns = make(map[string]*listener)
+var lns = make(map[string]*listenerWrapper)
 var conns = make(map[string]net.Conn)
 
 type NativeSockets struct {
@@ -46,7 +46,7 @@ var native = &NativeSockets{
 func (scks NativeSockets) Listen(addr string) string {
 	ln, err := net.Listen("tcp", addr)
 	util.Check(err)
-	l := &listener{
+	l := &listenerWrapper{
 		ln: ln,
 		id: fmt.Sprintf("listen://%s", ln.Addr().String()),
 	}
