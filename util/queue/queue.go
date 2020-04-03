@@ -20,11 +20,10 @@ func (q *queue) Put(element interface{}) {
 	}
 	log.Printf("Produced %s", element)
 	q.l = append(q.l, element)
+	q.c.Broadcast()
 }
 
-func (q *queue) Shift() interface{} {
-	q.c.L.Lock()
-	defer q.c.L.Unlock()
+func (q *queue) internalShift() interface{} {
 	if len(q.l) == 0 {
 		log.Printf("Nothing to consume")
 		return nil
@@ -32,8 +31,24 @@ func (q *queue) Shift() interface{} {
 	ret := q.l[0]
 	q.l = q.l[1:]
 	q.c.Broadcast()
-	log.Printf("Consuming %s", ret)
+	log.Printf("Consumed %s", ret)
 	return ret
+}
+
+func (q *queue) Shift() interface{} {
+	q.c.L.Lock()
+	defer q.c.L.Unlock()
+	return q.internalShift()
+}
+
+func (q *queue) WaitShift() interface{} {
+	q.c.L.Lock()
+	defer q.c.L.Unlock()
+	for len(q.l) <= 0 {
+		log.Printf("Consuming...")
+		q.c.Wait()
+	}
+	return q.internalShift()
 }
 
 func New(max int) *queue {
