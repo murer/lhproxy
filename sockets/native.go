@@ -36,6 +36,7 @@ func (scks NativeSockets) Accept(name string) string {
 	util.Check(err)
 	ret := fmt.Sprintf("tcp://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String())
 	log.Printf("Accepted %s", ret)
+	log.Printf("[TODO] Close accepeted connection: %s", ret)
 	return ret
 }
 
