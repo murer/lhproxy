@@ -13,10 +13,15 @@ import (
 type connWrapper struct {
 	id string
 	conn net.Conn
+	reader *queue.Queue
 }
 
 func (c *connWrapper) Close() {
 	c.conn.Close()
+}
+
+func (c *connWrapper) startReading() {
+	log.Printf("Starting reading conn: %s", c.id)
 }
 
 type listenerWrapper struct {
@@ -50,8 +55,10 @@ func (l *listenerWrapper) startAccepts() {
 		c := &connWrapper{
 			id: fmt.Sprintf("conn://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String()),
 			conn: conn,
+			reader: queue.New(100 * 1024),
 		}
 		log.Printf("Caching accepted conn: %s", c.id)
+		c.startReading()
 		l.queue.Put(c)
 	}
 }

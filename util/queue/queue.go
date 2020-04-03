@@ -11,15 +11,15 @@ type Queue struct {
 	l []interface{}
 }
 
-func (q *Queue) Put(element interface{}) {
+func (q *Queue) Put(elements ...interface{}) {
 	q.c.L.Lock()
 	defer q.c.L.Unlock()
 	for len(q.l) >= q.m {
-		log.Printf("Producing %v", element)
+		log.Printf("Producing %v", elements)
 		q.c.Wait()
 	}
-	log.Printf("Produced %v", element)
-	q.l = append(q.l, element)
+	log.Printf("Produced %v", elements)
+	q.l = append(q.l, elements...)
 	q.c.Broadcast()
 }
 

@@ -8,8 +8,7 @@ import (
 
 func TestQueueInt(t *testing.T) {
 	q := New(2)
-	q.Put(10)
-	q.Put(20)
+	q.Put(10, 20)
 	assert.Equal(t, 2, len(q.l))
 	assert.Equal(t, 10, q.Shift())
 	assert.Equal(t, 20, q.Shift())
@@ -22,8 +21,7 @@ func TestQueueStruct(t *testing.T) {
 		N string
 	}
 	q := New(2)
-	q.Put(&mystruct{"a"})
-	q.Put(&mystruct{"b"})
+	q.Put(&mystruct{"a"}, &mystruct{"b"})
 	assert.Equal(t, 2, len(q.l))
 	assert.Equal(t, &mystruct{"a"}, q.Shift())
 	assert.Equal(t, &mystruct{"b"}, q.Shift())
