@@ -55,6 +55,6 @@ func spec(t *testing.T, scks Sockets) {
 	assert.Nil(t, scks.Read(cs1, 2))
 }
 
-func TestSockets(t *testing.T) {
+func TestNativeSockets(t *testing.T) {
 	spec(t, GetNative())
 }
