@@ -15,10 +15,10 @@ func (q *queue) Put(element interface{}) {
 	q.c.L.Lock()
 	defer q.c.L.Unlock()
 	for len(q.l) >= q.m {
-		log.Printf("Producing %s", element)
+		log.Printf("Producing %v", element)
 		q.c.Wait()
 	}
-	log.Printf("Produced %s", element)
+	log.Printf("Produced %v", element)
 	q.l = append(q.l, element)
 	q.c.Broadcast()
 }
@@ -31,7 +31,7 @@ func (q *queue) internalShift() interface{} {
 	ret := q.l[0]
 	q.l = q.l[1:]
 	q.c.Broadcast()
-	log.Printf("Consumed %s", ret)
+	log.Printf("Consumed %v", ret)
 	return ret
 }
 
