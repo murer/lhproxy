@@ -13,7 +13,8 @@ func TestQueueInt(t *testing.T) {
 	assert.Equal(t, 2, len(q.l))
 	assert.Equal(t, 10, q.Shift())
 	assert.Equal(t, 20, q.Shift())
-	assert.Equal(t, 0, len(q.l))	
+	assert.Equal(t, 0, len(q.l))
+	assert.Nil(t, q.Shift())
 }
 
 func TestQueueStruct(t *testing.T) {
@@ -27,6 +28,7 @@ func TestQueueStruct(t *testing.T) {
 	assert.Equal(t, &mystruct{"a"}, q.Shift())
 	assert.Equal(t, &mystruct{"b"}, q.Shift())
 	assert.Equal(t, 0, len(q.l))
+	assert.Nil(t, q.Shift())
 }
 
 

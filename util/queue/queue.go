@@ -9,6 +9,9 @@ func (q *queue) Put(element interface{}) {
 }
 
 func (q *queue) Shift() interface{} {
+	if len(q.l) == 0 {
+		return nil
+	}
 	ret := q.l[0]
 	q.l = q.l[1:]
 	return ret
