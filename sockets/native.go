@@ -8,6 +8,9 @@ import (
 	"github.com/murer/lhproxy/util"
 )
 
+var lns = make(map[string]*listener)
+var conns = make(map[string]net.Conn)
+
 type NativeSockets struct {
 
 }
@@ -16,28 +19,55 @@ var native = &NativeSockets{
 
 }
 
-var lns = make(map[string]net.Listener)
-var conns = make(map[string]net.Conn)
-
 func (scks NativeSockets) Listen(addr string) string {
 	ln, err := net.Listen("tcp", addr)
 	util.Check(err)
-	ret := fmt.Sprintf("listen://%s", ln.Addr().String())
-	lns[ret] = ln
-	log.Printf("Listen %s", ln.Addr())
-	log.Printf("[TODO] Close listener: %s", ret)
-	return ret
+	l := &listener{
+		ln: ln,
+		id: fmt.Sprintf("listen://%s", ln.Addr().String()),
+	}
+	lns[l.id] = l
+	log.Printf("Listen %s", l.id)
+	log.Printf("[TODO] Close listener: %s", l.id)
+	return l.id
 }
 
 func (scks NativeSockets) Accept(name string) string {
-	ln := lns[name]
-	log.Printf("Accepting %s", ln.Addr().String())
-	conn, err := ln.Accept()
-	util.Check(err)
+	l := lns[name]
+	log.Printf("Accepting %s", l.id)
+	conn := l.accept()
+	if conn == nil {
+		log.Printf("No connection accepted: %s", l.id)
+		return ""
+	}
 	ret := fmt.Sprintf("tcp://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String())
 	log.Printf("Accepted %s", ret)
 	log.Printf("[TODO] Close accepeted connection: %s", ret)
 	return ret
+}
+
+type listener struct {
+	ln net.Listener
+	id string
+	conn net.Conn
+}
+
+func (l listener) nextConn() {
+	if l.conn != nil {
+		log.Panicf("there already is a connection")
+	}
+	conn, err := l.ln.Accept()
+	util.Check(err)
+	ret := fmt.Sprintf("tcp://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String())
+	log.Printf("Cached accepted connection %s", ret)
+	l.conn = conn
+}
+
+func (l listener) accept() net.Conn {
+	if l.conn == nil {
+		return l.conn
+	}
+	return nil
 }
 
 func GetNative() *NativeSockets {
