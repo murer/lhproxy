@@ -10,7 +10,7 @@ import (
 	"github.com/murer/lhproxy/util"
 )
 
-func TestStart(t *testing.T) {
+func TestVersion(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(handle))
 	defer server.Close()
 	t.Logf("URL: %s", server.URL)
