@@ -152,7 +152,18 @@ func (scks *NativeSockets) Read(id string, max int) []byte {
 	for i := 0; i < len(buf); i++ {
 		ret[i] = buf[i].(byte)
 	}
+	log.Printf("Read %s: %d", c.id, len(ret))
 	return ret
+}
+
+func (scks *NativeSockets) Write(id string, data []byte) {
+	c := conns[id]
+	log.Printf("Write %s: %d", c.id, len(data))
+	n, err := c.conn.Write(data)
+	util.Check(err)
+	if n != len(data) {
+		log.Panicf("Wrong: %d, should was: %d", n, len(data))
+	}
 }
 
 func GetNative() *NativeSockets {

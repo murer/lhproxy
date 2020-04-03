@@ -36,5 +36,10 @@ func TestSockets(t *testing.T) {
 	assert.NotEmpty(t, cs2)
 	defer scks.Close(cs2)
 
-	scks.Read(cs1, 3)
+	assert.Equal(t, []byte{}, scks.Read(cs1, 2))
+	scks.Write(cc1, []byte{5, 6, 7})
+	time.Sleep(100 * time.Millisecond)
+	assert.Equal(t, []byte{5, 6}, scks.Read(cs1, 2))
+	assert.Equal(t, []byte{7}, scks.Read(cs1, 2))
+
 }
