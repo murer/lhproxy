@@ -79,6 +79,17 @@ func (scks NativeSockets) Accept(name string) string {
 	return conn.id
 }
 
+func (scks NativeSockets) Connect(addr string) string {
+	conn, err := net.Dial("tcp", addr)
+	util.Check(err)
+	c := &connWrapper{
+		id: fmt.Sprintf("conn://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String()),
+		conn: conn,
+	}
+	log.Printf("Connected: %s", c.id)
+	return c.id
+}
+
 func GetNative() *NativeSockets {
 	return native
 }
