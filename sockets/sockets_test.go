@@ -36,6 +36,5 @@ func TestSockets(t *testing.T) {
 	assert.NotEmpty(t, cs2)
 	defer scks.Close(cs2)
 
-
 	scks.Read(cs1, 3)
 }

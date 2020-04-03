@@ -147,10 +147,12 @@ func (scks *NativeSockets) Close(id string) {
 
 func (scks *NativeSockets) Read(id string, max int) []byte {
 	c := conns[id]
-	ret := make([]byte, max)
-	n, err := c.conn.Read(ret)
-	util.Check(err)
-	return ret[:n]
+	buf := c.reader.Shiftn(max)
+	ret := make([]byte, len(buf))
+	for i := 0; i < len(buf); i++ {
+		ret[i] = buf[i].(byte)
+	}
+	return ret
 }
 
 func GetNative() *NativeSockets {

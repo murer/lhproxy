@@ -12,7 +12,7 @@ cmd_golang() {
 
 cmd_test() {
   # --proxy http://C80795A:QWEasd1@@localhost:6001
-  cmd_golang go test ./util ./util/queue ./server  "$@"
+  cmd_golang go test ./util ./util/queue ./server ./sockets "$@"
 }
 
 cmd_curl_test() {
