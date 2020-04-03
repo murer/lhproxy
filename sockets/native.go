@@ -43,7 +43,7 @@ func (l listenerWrapper) nextAccpet() {
 }
 
 var lns = make(map[string]*listenerWrapper)
-var conns = make(map[string]net.Conn)
+var conns = make(map[string]*connWrapper)
 
 type NativeSockets struct {
 
@@ -74,6 +74,7 @@ func (scks NativeSockets) Accept(name string) string {
 		log.Printf("No connection accepted: %s", l.id)
 		return ""
 	}
+	conns[conn.id] = conn
 	log.Printf("Accepted %s", conn.id)
 	log.Printf("[TODO] Close accepeted connection: %s", conn.id)
 	return conn.id
@@ -86,6 +87,7 @@ func (scks NativeSockets) Connect(addr string) string {
 		id: fmt.Sprintf("conn://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String()),
 		conn: conn,
 	}
+	conns[c.id] = c
 	log.Printf("Connected: %s", c.id)
 	return c.id
 }
