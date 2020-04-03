@@ -199,6 +199,6 @@ func (scks *NativeSockets) Write(id string, data []byte) {
 	}
 }
 
-func GetNative() *NativeSockets {
+func GetNative() Sockets {
 	return native
 }
