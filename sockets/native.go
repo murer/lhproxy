@@ -4,11 +4,10 @@ import (
 	"log"
 	"net"
 	"fmt"
-	"sync"
 	"strings"
 
 	"github.com/murer/lhproxy/util"
-	// "github.com/murer/lhproxy/util/queue"
+	"github.com/murer/lhproxy/util/queue"
 )
 
 type connWrapper struct {
@@ -23,60 +22,44 @@ func (c *connWrapper) Close() {
 type listenerWrapper struct {
 	id string
 	ln net.Listener
-	conn *connWrapper
-	mutex sync.Mutex
+	queue *queue.Queue
 }
 
 func (l *listenerWrapper) Close() {
 	l.ln.Close()
-	l.mutex.Lock()
-	defer l.mutex.Unlock()
-	if l.conn != nil {
-		l.conn.Close()
-	}
 }
 
 func (l *listenerWrapper) accept() *connWrapper {
-	l.mutex.Lock()
-	defer l.mutex.Unlock()
-	if l.conn == nil {
-		log.Printf("XXXXXXXXXX")
+	ret := l.queue.Shift()
+	if ret == nil {
 		return nil
 	}
-	ret := l.conn
-	l.conn = nil
-	go l.nextAccpet()
-	return ret
+	return ret.(*connWrapper)
 }
 
-func (l *listenerWrapper) nextAccpet() {
-	log.Printf("YYYYYYYYYYy")
-	conn, err := l.ln.Accept()
-	if err != nil {
-		if strings.Contains(err.Error(), "use of closed network connection") {
-			return
+func (l *listenerWrapper) startAccepts() {
+	log.Printf("Starting accepts")
+	for true {
+		conn, err := l.ln.Accept()
+		if err != nil {
+			if strings.Contains(err.Error(), "use of closed network connection") {
+				return
+			}
+			util.Check(err)
 		}
-		util.Check(err)
+		c := &connWrapper{
+			id: fmt.Sprintf("conn://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String()),
+			conn: conn,
+		}
+		log.Printf("Caching accepted conn: %s", c.id)
+		l.queue.Put(c)
 	}
-	c := &connWrapper{
-		id: fmt.Sprintf("conn://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String()),
-		conn: conn,
-	}
-	log.Printf("Caching accepted conn: %s", c.id)
-	l.conn = c
-	log.Printf("UUUUUU: %s", l.conn.id)
 }
 
 var lns = make(map[string]*listenerWrapper)
 var conns = make(map[string]*connWrapper)
-
-type NativeSockets struct {
-
-}
-
-var native = &NativeSockets{
-
-}
+type NativeSockets struct {}
+var native = &NativeSockets{}
 
 func (scks *NativeSockets) Listen(addr string) string {
 	ln, err := net.Listen("tcp", addr)
@@ -84,8 +67,9 @@ func (scks *NativeSockets) Listen(addr string) string {
 	l := &listenerWrapper{
 		ln: ln,
 		id: fmt.Sprintf("listen://%s", ln.Addr().String()),
+		queue: queue.New(1),
 	}
-	go l.nextAccpet()
+	go l.startAccepts()
 	lns[l.id] = l
 	log.Printf("Listen %s", l.id)
 	log.Printf("[TODO] Close listener: %s", l.id)
