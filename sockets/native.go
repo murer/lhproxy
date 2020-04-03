@@ -5,15 +5,20 @@ import (
 	"net"
 	"fmt"
 	"strings"
+	"io"
 
 	"github.com/murer/lhproxy/util"
 	"github.com/murer/lhproxy/util/queue"
 )
 
+const BUFFER_SIZE = 100 * 1024
+
 type connWrapper struct {
 	id string
 	conn net.Conn
 	reader *queue.Queue
+	lastUsed int64
+	eof bool
 }
 
 func (c *connWrapper) Close() {
@@ -28,7 +33,10 @@ func (c *connWrapper) startReading() {
 		if err != nil {
 			if strings.Contains(err.Error(), "use of closed network connection") {
 				return
-			}
+			} else if err == io.EOF {
+				c.reader.Put("EOF")
+	      return
+	    }
 			util.Check(err)
 		}
 		ret := make([]interface{}, n)
@@ -49,6 +57,7 @@ type listenerWrapper struct {
 	id string
 	ln net.Listener
 	queue *queue.Queue
+	lastUsed int64
 }
 
 func (l *listenerWrapper) Close() {
@@ -76,7 +85,8 @@ func (l *listenerWrapper) startAccepts() {
 		c := &connWrapper{
 			id: fmt.Sprintf("conn://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String()),
 			conn: conn,
-			reader: queue.New(100 * 1024),
+			reader: queue.New(BUFFER_SIZE),
+			eof: false,
 		}
 		log.Printf("Caching accepted conn: %s", c.id)
 		go c.startReading()
@@ -122,8 +132,11 @@ func (scks *NativeSockets) Connect(addr string) string {
 	c := &connWrapper{
 		id: fmt.Sprintf("conn://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String()),
 		conn: conn,
+		reader: queue.New(BUFFER_SIZE),
+		eof: false,
 	}
 	conns[c.id] = c
+	go c.startReading()
 	log.Printf("Connected: %s", c.id)
 	return c.id
 }
@@ -145,10 +158,25 @@ func (scks *NativeSockets) Close(id string) {
 
 func (scks *NativeSockets) Read(id string, max int) []byte {
 	c := conns[id]
+	if c.eof {
+		return nil
+	}
 	buf := c.reader.Shiftn(max)
 	ret := make([]byte, len(buf))
 	for i := 0; i < len(buf); i++ {
-		ret[i] = buf[i].(byte)
+		switch v := buf[i].(type) {
+			case string:
+				c.eof = true
+				continue
+			default:
+				ret[i] = v.(byte)
+		}
+	}
+	if c.eof {
+		ret = ret[:len(ret)-1]
+	}
+	if c.eof && len(ret) == 0 {
+		ret = nil
 	}
 	log.Printf("Read %s: %d", c.id, len(ret))
 	return ret
