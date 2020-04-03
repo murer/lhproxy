@@ -35,7 +35,7 @@ func (c *connWrapper) startReading() {
 		for i := 0; i < n; i++ {
 			ret[i] = buf[i]
 		}
-		log.Printf("Caching read %s: %x", c.id, ret)
+		log.Printf("Caching read %s: %x", c.id, len(ret))
 		if n > 0 {
 			c.reader.Put(ret...)
 		}
