@@ -34,19 +34,17 @@ func TestQueueStruct(t *testing.T) {
 func TestQueueAsync(t *testing.T) {
 	q := New(2)
 	go func() {
-		for i := 0; i < 3; i++ {
-			time.Sleep(10 * time.Millisecond)
-			q.Put((i+1) * 10)
-		}
+		q.Put(10)
+		q.Put(20)
+		q.Put(30)
 	}()
-	assert.Nil(t, q.Shift())
 	time.Sleep(50 * time.Millisecond)
 	assert.Equal(t, 10, q.Shift())
 	assert.Equal(t, 20, q.Shift())
-	assert.Nil(t, q.Shift())
-	time.Sleep(30 * time.Millisecond)
 	assert.Equal(t, 30, q.Shift())
 	assert.Nil(t, q.Shift())
+	// time.Sleep(100 * time.Millisecond)
+	// assert.Equal(t, 40, q.Shift())
 }
 
 
