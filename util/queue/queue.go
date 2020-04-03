@@ -23,32 +23,52 @@ func (q *Queue) Put(elements ...interface{}) {
 	q.c.Broadcast()
 }
 
-func (q *Queue) internalShift() interface{} {
+func (q *Queue) internalShift(max int) []interface{} {
 	if len(q.l) == 0 {
 		log.Printf("Nothing to consume")
 		return nil
 	}
-	ret := q.l[0]
-	q.l = q.l[1:]
+	m := max
+	if len(q.l) < max {
+		m = len(q.l)
+	}
+	ret := q.l[0:m]
+	q.l = q.l[m:]
 	q.c.Broadcast()
 	log.Printf("Consumed %v", ret)
 	return ret
 }
 
 func (q *Queue) Shift() interface{} {
-	q.c.L.Lock()
-	defer q.c.L.Unlock()
-	return q.internalShift()
+	ret := q.Shiftn(1)
+	if len(ret) == 0 {
+		return nil
+	}
+	return ret[0]
 }
 
-func (q *Queue) WaitShift() interface{} {
+func (q *Queue) Shiftn(max int) []interface{} {
+	q.c.L.Lock()
+	defer q.c.L.Unlock()
+	return q.internalShift(max)
+}
+
+func (q *Queue) WaitShiftn(max int) []interface{} {
 	q.c.L.Lock()
 	defer q.c.L.Unlock()
 	for len(q.l) <= 0 {
 		log.Printf("Consuming...")
 		q.c.Wait()
 	}
-	return q.internalShift()
+	return q.internalShift(1)
+}
+
+func (q *Queue) WaitShift() interface{} {
+	ret := q.WaitShiftn(1)
+	if len(ret) == 0 {
+		return nil
+	}
+	return ret[0]
 }
 
 func New(max int) *Queue {

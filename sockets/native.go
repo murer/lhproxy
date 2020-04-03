@@ -22,6 +22,27 @@ func (c *connWrapper) Close() {
 
 func (c *connWrapper) startReading() {
 	log.Printf("Starting reading conn: %s", c.id)
+	buf := make([]byte, 8 * 1024)
+	for true {
+		n, err := c.conn.Read(buf)
+		if err != nil {
+			if strings.Contains(err.Error(), "use of closed network connection") {
+				return
+			}
+			util.Check(err)
+		}
+		ret := make([]interface{}, n)
+		for i := 0; i < n; i++ {
+			ret[i] = buf[i]
+		}
+		log.Printf("READ %x", ret)
+		if n > 0 {
+			c.reader.Put(ret...)
+		}
+		if n < 0 {
+			panic(n)
+		}
+	}
 }
 
 type listenerWrapper struct {
@@ -58,7 +79,7 @@ func (l *listenerWrapper) startAccepts() {
 			reader: queue.New(100 * 1024),
 		}
 		log.Printf("Caching accepted conn: %s", c.id)
-		c.startReading()
+		go c.startReading()
 		l.queue.Put(c)
 	}
 }
@@ -125,8 +146,8 @@ func (scks *NativeSockets) Close(id string) {
 }
 
 func (scks *NativeSockets) Read(id string, max int) []byte {
-	ret := make([]byte, max)
 	c := conns[id]
+	ret := make([]byte, max)
 	n, err := c.conn.Read(ret)
 	util.Check(err)
 	return ret[:n]
