@@ -5,6 +5,7 @@ import (
 	"net"
 	"fmt"
 	"sync"
+	"strings"
 	"github.com/murer/lhproxy/util"
 )
 
@@ -13,8 +14,8 @@ type connWrapper struct {
 	conn net.Conn
 }
 
-func (c connWrapper) Close() {
-	util.Check(c.conn.Close())
+func (c *connWrapper) Close() {
+	c.conn.Close()
 }
 
 type listenerWrapper struct {
@@ -24,8 +25,8 @@ type listenerWrapper struct {
 	mutex sync.Mutex
 }
 
-func (l listenerWrapper) Close() {
-	util.Check(l.ln.Close())
+func (l *listenerWrapper) Close() {
+	l.ln.Close()
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 	if l.conn != nil {
@@ -33,7 +34,7 @@ func (l listenerWrapper) Close() {
 	}
 }
 
-func (l listenerWrapper) accept() *connWrapper {
+func (l *listenerWrapper) accept() *connWrapper {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 	if l.conn == nil {
@@ -45,11 +46,19 @@ func (l listenerWrapper) accept() *connWrapper {
 	return ret
 }
 
-func (l listenerWrapper) nextAccpet() {
+func x(a string) {
+
+}
+
+func (l *listenerWrapper) nextAccpet() {
 	log.Printf("YYYYYYYYYYy")
 	conn, err := l.ln.Accept()
-	log.Printf("ZZZZZZZZZZzzz")
-	util.Check(err)
+	if err != nil {
+		if strings.Contains(err.Error(), "use of closed network connection") {
+			return
+		}
+		util.Check(err)
+	}
 	c := &connWrapper{
 		id: fmt.Sprintf("conn://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String()),
 		conn: conn,
@@ -124,7 +133,6 @@ func (scks NativeSockets) Close(id string) {
 		c.Close()
 	}
 }
-
 
 func GetNative() *NativeSockets {
 	return native

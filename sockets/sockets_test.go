@@ -20,7 +20,7 @@ func TestSockets(t *testing.T) {
 	cc := scks.Connect("127.0.0.1:5001")
 	assert.NotEmpty(t, cc)
 	defer scks.Close(cc)
-	time.Sleep(7000 * time.Millisecond)
+	time.Sleep(10 * time.Millisecond)
 	cs := scks.Accept(listen)
 	assert.NotEmpty(t, cs)
 	defer scks.Close(cs)
