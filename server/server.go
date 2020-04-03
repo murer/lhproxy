@@ -16,5 +16,5 @@ func Start() {
 
 func handle(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Access: %s %s %s", r.RemoteAddr, r.Method, r.URL)
-	w.Write([]byte{})
+	w.Write([]byte(util.Version))
 }
