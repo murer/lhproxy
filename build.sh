@@ -11,7 +11,7 @@ cmd_golang() {
 
 cmd_test() {
   # --proxy http://C80795A:QWEasd1@@localhost:6001
-  cmd_golang go test ./util ./cmd
+  cmd_golang go test ./util -v
 }
 
 cmd_curl_test() {
