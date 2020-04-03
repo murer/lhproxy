@@ -11,8 +11,7 @@ import (
 	// "github.com/murer/lhproxy/util"
 )
 
-func TestSockets(t *testing.T) {
-	scks := GetNative()
+func spec(t *testing.T, scks Sockets) {
 	listen := scks.Listen("127.0.0.1:5001")
 	assert.NotNil(t, listen)
 	defer scks.Close(listen)
@@ -54,4 +53,8 @@ func TestSockets(t *testing.T) {
 	time.Sleep(100 * time.Millisecond)
 	assert.Nil(t, scks.Read(cs1, 2))
 	assert.Nil(t, scks.Read(cs1, 2))
+}
+
+func TestSockets(t *testing.T) {
+	spec(t, GetNative())
 }
