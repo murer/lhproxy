@@ -1,7 +1,6 @@
 package queue
 
 import (
-	"log"
 	"sync"
 )
 
@@ -14,18 +13,15 @@ type Queue struct {
 func (q *Queue) Put(elements ...interface{}) {
 	q.c.L.Lock()
 	defer q.c.L.Unlock()
-	for len(q.l) >= q.m {
-		log.Printf("Producing %v", elements)
+	for len(q.l) >= q.m {		
 		q.c.Wait()
-	}
-	log.Printf("Produced %v", elements)
+	}	
 	q.l = append(q.l, elements...)
 	q.c.Broadcast()
 }
 
 func (q *Queue) internalShift(max int) []interface{} {
-	if len(q.l) == 0 {
-		log.Printf("Nothing to consume")
+	if len(q.l) == 0 {		
 		return nil
 	}
 	m := max
@@ -34,8 +30,7 @@ func (q *Queue) internalShift(max int) []interface{} {
 	}
 	ret := q.l[0:m]
 	q.l = q.l[m:]
-	q.c.Broadcast()
-	log.Printf("Consumed %v", ret)
+	q.c.Broadcast()	
 	return ret
 }
 
@@ -56,8 +51,7 @@ func (q *Queue) Shiftn(max int) []interface{} {
 func (q *Queue) WaitShiftn(max int) []interface{} {
 	q.c.L.Lock()
 	defer q.c.L.Unlock()
-	for len(q.l) <= 0 {
-		log.Printf("Consuming...")
+	for len(q.l) <= 0 {		
 		q.c.Wait()
 	}
 	return q.internalShift(1)
