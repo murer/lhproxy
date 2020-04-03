@@ -8,6 +8,30 @@ import (
 	"github.com/murer/lhproxy/util"
 )
 
+type listener struct {
+	ln net.Listener
+	id string
+	conn net.Conn
+}
+
+func (l listener) nextConn() {
+	if l.conn != nil {
+		log.Panicf("there already is a connection")
+	}
+	conn, err := l.ln.Accept()
+	util.Check(err)
+	ret := fmt.Sprintf("tcp://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String())
+	log.Printf("Cached accepted connection %s", ret)
+	l.conn = conn
+}
+
+func (l listener) accept() net.Conn {
+	if l.conn == nil {
+		return l.conn
+	}
+	return nil
+}
+
 var lns = make(map[string]*listener)
 var conns = make(map[string]net.Conn)
 
@@ -44,30 +68,6 @@ func (scks NativeSockets) Accept(name string) string {
 	log.Printf("Accepted %s", ret)
 	log.Printf("[TODO] Close accepeted connection: %s", ret)
 	return ret
-}
-
-type listener struct {
-	ln net.Listener
-	id string
-	conn net.Conn
-}
-
-func (l listener) nextConn() {
-	if l.conn != nil {
-		log.Panicf("there already is a connection")
-	}
-	conn, err := l.ln.Accept()
-	util.Check(err)
-	ret := fmt.Sprintf("tcp://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String())
-	log.Printf("Cached accepted connection %s", ret)
-	l.conn = conn
-}
-
-func (l listener) accept() net.Conn {
-	if l.conn == nil {
-		return l.conn
-	}
-	return nil
 }
 
 func GetNative() *NativeSockets {
