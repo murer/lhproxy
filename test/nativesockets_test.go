@@ -1,4 +1,4 @@
-package sockets
+package test
 
 import (
 	"testing"
@@ -8,10 +8,10 @@ import (
 	//
 	"github.com/stretchr/testify/assert"
 	//
-	// "github.com/murer/lhproxy/util"
+	"github.com/murer/lhproxy/sockets"
 )
 
-func spec(t *testing.T, scks Sockets) {
+func SocksTest(t *testing.T, scks sockets.Sockets) {
 	listen := scks.Listen("127.0.0.1:5001")
 	assert.NotNil(t, listen)
 	defer scks.Close(listen)
@@ -56,5 +56,5 @@ func spec(t *testing.T, scks Sockets) {
 }
 
 func TestNativeSockets(t *testing.T) {
-	spec(t, GetNative())
+	SocksTest(t, sockets.GetNative())
 }

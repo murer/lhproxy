@@ -11,7 +11,7 @@ import (
 )
 
 func TestVersion(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(handle))
+	server := httptest.NewServer(http.HandlerFunc(Handle))
 	defer server.Close()
 	t.Logf("URL: %s", server.URL)
 	resp, err := http.Get(server.URL + "/version.txt")
