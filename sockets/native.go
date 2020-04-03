@@ -42,12 +42,9 @@ func (l *listenerWrapper) accept() *connWrapper {
 		return nil
 	}
 	ret := l.conn
+	l.conn = nil
 	go l.nextAccpet()
 	return ret
-}
-
-func x(a string) {
-
 }
 
 func (l *listenerWrapper) nextAccpet() {
@@ -134,8 +131,12 @@ func (scks *NativeSockets) Close(id string) {
 	}
 }
 
-func (scks *NativeSockets) Read(id string) {
-
+func (scks *NativeSockets) Read(id string, max int) []byte {
+	ret := make([]byte, max)
+	c := conns[id]
+	n, err := c.conn.Read(ret)
+	util.Check(err)
+	return ret[:n]
 }
 
 func GetNative() *NativeSockets {
