@@ -13,11 +13,24 @@ type connWrapper struct {
 	conn net.Conn
 }
 
+func (c connWrapper) Close() {
+	util.Check(c.conn.Close())
+}
+
 type listenerWrapper struct {
 	id string
 	ln net.Listener
 	conn *connWrapper
 	mutex sync.Mutex
+}
+
+func (l listenerWrapper) Close() {
+	util.Check(l.ln.Close())
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+	if l.conn != nil {
+		l.conn.Close()
+	}
 }
 
 func (l listenerWrapper) accept() *connWrapper {
@@ -91,6 +104,22 @@ func (scks NativeSockets) Connect(addr string) string {
 	log.Printf("Connected: %s", c.id)
 	return c.id
 }
+
+func (scks NativeSockets) Close(id string) {
+	l := lns[id]
+	if l != nil {
+		log.Printf("Closing listen %s", l.id)
+		delete(lns, l.id)
+		l.Close()
+	}
+	c := conns[id]
+	if c != nil {
+		log.Printf("Closing connection %s", c.id)
+		delete(conns, c.id)
+		c.Close()
+	}
+}
+
 
 func GetNative() *NativeSockets {
 	return native

@@ -17,4 +17,5 @@ func TestSockets(t *testing.T) {
 	assert.Empty(t, scks.Accept(listen))
 	c := scks.Connect("127.0.0.1:5001")
 	assert.NotEmpty(t, c)
+	scks.Close(c)
 }
