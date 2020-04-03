@@ -12,6 +12,8 @@ import (
 
 func TestSockets(t *testing.T) {
 	scks := GetNative()
-	port := scks.Listen("s")
-	assert.Less(t, 0, port)
+	listen := scks.Listen("127.0.0.1:5001")
+	assert.NotNil(t, listen)
+
+	scks.Accept(listen)
 }
