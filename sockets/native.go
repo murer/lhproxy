@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"sync"
 	"strings"
+
 	"github.com/murer/lhproxy/util"
+	// "github.com/murer/lhproxy/util/queue"
 )
 
 type connWrapper struct {

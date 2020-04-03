@@ -5,13 +5,13 @@ import (
 	"sync"
 )
 
-type queue struct {
+type Queue struct {
 	c *sync.Cond
 	m int
 	l []interface{}
 }
 
-func (q *queue) Put(element interface{}) {
+func (q *Queue) Put(element interface{}) {
 	q.c.L.Lock()
 	defer q.c.L.Unlock()
 	for len(q.l) >= q.m {
@@ -23,7 +23,7 @@ func (q *queue) Put(element interface{}) {
 	q.c.Broadcast()
 }
 
-func (q *queue) internalShift() interface{} {
+func (q *Queue) internalShift() interface{} {
 	if len(q.l) == 0 {
 		log.Printf("Nothing to consume")
 		return nil
@@ -35,13 +35,13 @@ func (q *queue) internalShift() interface{} {
 	return ret
 }
 
-func (q *queue) Shift() interface{} {
+func (q *Queue) Shift() interface{} {
 	q.c.L.Lock()
 	defer q.c.L.Unlock()
 	return q.internalShift()
 }
 
-func (q *queue) WaitShift() interface{} {
+func (q *Queue) WaitShift() interface{} {
 	q.c.L.Lock()
 	defer q.c.L.Unlock()
 	for len(q.l) <= 0 {
@@ -51,8 +51,8 @@ func (q *queue) WaitShift() interface{} {
 	return q.internalShift()
 }
 
-func New(max int) *queue {
-	return &queue{
+func New(max int) *Queue {
+	return &Queue{
 		c: sync.NewCond(&sync.Mutex{}),
 		m: max,
 	}
