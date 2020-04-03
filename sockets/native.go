@@ -37,6 +37,7 @@ func (l listenerWrapper) accept() *connWrapper {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 	if l.conn == nil {
+		log.Printf("XXXXXXXXXX")
 		return nil
 	}
 	ret := l.conn
@@ -45,7 +46,9 @@ func (l listenerWrapper) accept() *connWrapper {
 }
 
 func (l listenerWrapper) nextAccpet() {
+	log.Printf("YYYYYYYYYYy")
 	conn, err := l.ln.Accept()
+	log.Printf("ZZZZZZZZZZzzz")
 	util.Check(err)
 	c := &connWrapper{
 		id: fmt.Sprintf("conn://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String()),
@@ -53,6 +56,7 @@ func (l listenerWrapper) nextAccpet() {
 	}
 	log.Printf("Caching accepted conn: %s", c.id)
 	l.conn = c
+	log.Printf("UUUUUU: %s", l.conn.id)
 }
 
 var lns = make(map[string]*listenerWrapper)
@@ -73,6 +77,7 @@ func (scks NativeSockets) Listen(addr string) string {
 		ln: ln,
 		id: fmt.Sprintf("listen://%s", ln.Addr().String()),
 	}
+	go l.nextAccpet()
 	lns[l.id] = l
 	log.Printf("Listen %s", l.id)
 	log.Printf("[TODO] Close listener: %s", l.id)
