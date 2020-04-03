@@ -4,32 +4,42 @@ import (
 	"log"
 	"net"
 	"fmt"
-
+	"sync"
 	"github.com/murer/lhproxy/util"
 )
 
-type listenerWrapper struct {
-	ln net.Listener
+type connWrapper struct {
 	id string
 	conn net.Conn
 }
 
-func (l listenerWrapper) nextConn() {
-	if l.conn != nil {
-		log.Panicf("there already is a connection")
-	}
-	conn, err := l.ln.Accept()
-	util.Check(err)
-	ret := fmt.Sprintf("tcp://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String())
-	log.Printf("Cached accepted connection %s", ret)
-	l.conn = conn
+type listenerWrapper struct {
+	id string
+	ln net.Listener
+	conn *connWrapper
+	mutex sync.Mutex
 }
 
-func (l listenerWrapper) accept() net.Conn {
+func (l listenerWrapper) accept() *connWrapper {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
 	if l.conn == nil {
-		return l.conn
+		return nil
 	}
-	return nil
+	ret := l.conn
+	go l.nextAccpet()
+	return ret
+}
+
+func (l listenerWrapper) nextAccpet() {
+	conn, err := l.ln.Accept()
+	util.Check(err)
+	c := &connWrapper{
+		id: fmt.Sprintf("conn://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String()),
+		conn: conn,
+	}
+	log.Printf("Caching accepted conn: %s", c.id)
+	l.conn = c
 }
 
 var lns = make(map[string]*listenerWrapper)
@@ -64,10 +74,9 @@ func (scks NativeSockets) Accept(name string) string {
 		log.Printf("No connection accepted: %s", l.id)
 		return ""
 	}
-	ret := fmt.Sprintf("tcp://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String())
-	log.Printf("Accepted %s", ret)
-	log.Printf("[TODO] Close accepeted connection: %s", ret)
-	return ret
+	log.Printf("Accepted %s", conn.id)
+	log.Printf("[TODO] Close accepeted connection: %s", conn.id)
+	return conn.id
 }
 
 func GetNative() *NativeSockets {
