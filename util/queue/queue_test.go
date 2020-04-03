@@ -43,25 +43,4 @@ func TestQueueAsync(t *testing.T) {
 	assert.Equal(t, 20, q.Shift())
 	assert.Equal(t, 30, q.Shift())
 	assert.Nil(t, q.Shift())
-	// time.Sleep(100 * time.Millisecond)
-	// assert.Equal(t, 40, q.Shift())
 }
-
-
-
-	// go func() {
-	// 	for i := 1; i < 3; i++ {
-	// 		time.Sleep(10 * time.Millisecond)
-	// 		g.Put(&i)
-	// 	}
-	// }()
-	//
-	// assert.Nil(t, g.Shift())
-	// time.Sleep(50 * time.Millisecond)
-	// assert.Equal(t, 1, g.Shift())
-	// assert.Equal(t, 2, g.Shift())
-	// assert.Nil(t, g.Shift())
-	//
-	// time.Sleep(50 * time.Millisecond)
-	// assert.Equal(t, 3, g.Shift())
-	// assert.Nil(t, g.Shift())
