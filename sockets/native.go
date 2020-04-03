@@ -100,7 +100,6 @@ func (scks *NativeSockets) Listen(addr string) string {
 	go l.startAccepts()
 	lns[l.id] = l
 	log.Printf("Listen %s", l.id)
-	log.Printf("[TODO] Close listener: %s", l.id)
 	return l.id
 }
 
@@ -114,7 +113,6 @@ func (scks *NativeSockets) Accept(name string) string {
 	}
 	conns[conn.id] = conn
 	log.Printf("Accepted %s", conn.id)
-	log.Printf("[TODO] Close accepeted connection: %s", conn.id)
 	return conn.id
 }
 
