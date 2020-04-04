@@ -33,6 +33,6 @@ func TestPipe(t *testing.T) {
 	lw.Write([]byte{1,2})
 	assert.Equal(t, []byte{1,2}, util.ReadFully(rr, 2))
 	lw.Write([]byte{3,4})
-	assert.Equal(t, []byte{3,4}, util.ReadFully(rr, 2))
 	lw.Close()
+	assert.Equal(t, []byte{3,4}, util.ReadAll(rr))
 }

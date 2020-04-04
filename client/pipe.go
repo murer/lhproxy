@@ -2,6 +2,7 @@ package client
 
 import (
 	"io"
+	"log"
 	"github.com/murer/lhproxy/sockets"
 	"github.com/murer/lhproxy/util"
 )
@@ -9,13 +10,16 @@ import (
 type Pipe struct {
 	Scks sockets.Sockets
 	Address string
-	Writer io.Writer
-	Reader io.Reader
+	Writer io.WriteCloser
+	Reader io.ReadCloser
 }
 
 func (c Pipe) Execute() {
+	defer c.Writer.Close()
+	log.Printf("Start pipe to %s", c.Address)
 	_, err := io.Copy(c.Writer, c.Reader)
 	util.Check(err)
+	log.Printf("Pipe to %s is done", c.Address)
 	// buf := make([]byte, 8 * 1024)
 	// for true {
 	// 	n, err := c.LReader.Read(buf)
