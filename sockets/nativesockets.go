@@ -6,53 +6,42 @@ import (
 	"fmt"
 	"strings"
 	"time"
-	// "io"
+	"io"
 
 	"github.com/murer/lhproxy/util"
 	"github.com/murer/lhproxy/util/queue"
 )
 
-// const BUFFER_SIZE = 100 * 1024
 const READ_DEADLINE = 1 * time.Second
+
+const DESC_ERR_NONE = 0
+const DESC_ERR_OTHER = 1
+const DESC_ERR_EOF = 2
+const DESC_ERR_TIMEOUT = 3
+
+func DescError(err error) int {
+	if err == nil {
+		return DESC_ERR_NONE
+	}
+	if err == io.EOF {
+		return DESC_ERR_EOF
+	}
+	netErr, ok := err.(net.Error)
+	if ok && netErr.Timeout() {
+		return DESC_ERR_TIMEOUT
+	}
+	return DESC_ERR_OTHER
+}
 
 type connWrapper struct {
 	id string
 	conn net.Conn
 	lastUsed int64
-	eof bool
 }
 
 func (c *connWrapper) Close() {
 	c.conn.Close()
 }
-
-// func (c *connWrapper) startReading() {
-// 	log.Printf("Starting reading conn: %s", c.id)
-// 	buf := make([]byte, 8 * 1024)
-// 	for true {
-// 		n, err := c.conn.Read(buf)
-// 		if err != nil {
-// 			if strings.Contains(err.Error(), "use of closed network connection") {
-// 				return
-// 			} else if err == io.EOF {
-// 				c.reader.Put("EOF")
-// 	      return
-// 	    }
-// 			util.Check(err)
-// 		}
-// 		ret := make([]interface{}, n)
-// 		for i := 0; i < n; i++ {
-// 			ret[i] = buf[i]
-// 		}
-// 		log.Printf("Caching read %s: %x", c.id, len(ret))
-// 		if n > 0 {
-// 			c.reader.Put(ret...)
-// 		}
-// 		if n < 0 {
-// 			panic(n)
-// 		}
-// 	}
-// }
 
 type listenerWrapper struct {
 	id string
@@ -86,7 +75,6 @@ func (l *listenerWrapper) startAccepts() {
 		c := &connWrapper{
 			id: fmt.Sprintf("conn://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String()),
 			conn: conn,
-			eof: false,
 			lastUsed: time.Now().Unix(),
 		}
 		log.Printf("Caching accepted conn: %s", c.id)
@@ -134,7 +122,6 @@ func (scks *NativeSockets) Connect(addr string) string {
 	c := &connWrapper{
 		id: fmt.Sprintf("conn://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String()),
 		conn: conn,
-		eof: false,
 		lastUsed: time.Now().Unix(),
 	}
 	conns[c.id] = c
@@ -159,20 +146,21 @@ func (scks *NativeSockets) Close(id string) {
 
 func (scks *NativeSockets) Read(id string, max int) []byte {
 	c := conns[id]
-	c.lastUsed = time.Now().Unix()
-	if c.eof {
+	buf := make([]byte, max)
+	c.conn.SetReadDeadline(time.Now().Add(READ_DEADLINE))
+	n, err := c.conn.Read(buf)
+	derr := DescError(err)
+	if derr == DESC_ERR_EOF {
+		log.Printf("Read EOF %s", c.id)
 		return nil
 	}
-	ret := make([]byte, max)
-	n, err := c.conn.Read(ret)
-	util.Check(err)
-	if c.eof && n == 0 {
-		log.Printf("Read EOF %s", c.id)
-		ret = nil
+	if derr != DESC_ERR_TIMEOUT {
+		util.Check(err)
 	}
-	ret = ret[:n]
-	log.Printf("Read %s: %d", c.id, len(ret))
-	return ret
+	buf = buf[:n]
+	c.lastUsed = time.Now().Unix()
+	log.Printf("Read %s: %d", c.id, len(buf))
+	return buf
 }
 
 func (scks *NativeSockets) Write(id string, data []byte) {
