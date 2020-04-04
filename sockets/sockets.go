@@ -32,6 +32,7 @@ func ReplyServer(scks Sockets, listenId string) {
 					data := scks.Read(sckid, 16 * 1204)
 					if data == nil {
 						 scks.Close(sckid, CLOSE_OUT)
+						 break
 					}
 					scks.Write(sckid, data, CLOSE_NONE)
 				}
