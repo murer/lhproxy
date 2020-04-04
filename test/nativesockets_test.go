@@ -3,11 +3,9 @@ package test
 import (
 	"testing"
 	"time"
-	// "net/http"
-	// "net/http/httptest"
-	//
+
 	"github.com/stretchr/testify/assert"
-	//
+
 	"github.com/murer/lhproxy/sockets"
 )
 
@@ -69,7 +67,7 @@ func GetNative() sockets.Sockets {
 	}
 }
 
-// func TestNativeSockets(t *testing.T) {
-// 	native := GetNative()
-// 	SocksTest(t, native)
-// }
+func TestNativeSockets(t *testing.T) {
+	native := GetNative()
+	SocksTest(t, native)
+}
