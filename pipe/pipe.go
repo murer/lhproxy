@@ -55,6 +55,7 @@ func (c Pipe) Execute() {
 	defer c.Writer.Close()
 	c.channel = make(chan string)
 	c.sckid = c.Scks.Connect(c.Address)
+	defer c.Scks.Close(c.sckid, sockets.CLOSE_SCK)
 	go c.local2Server()
 	go c.server2Local()
 
