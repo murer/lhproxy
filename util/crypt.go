@@ -54,8 +54,8 @@ func (c *Cryptor) Encrypt(plaintext []byte) []byte {
 	block, err := aes.NewCipher(c.Secret)
 	Check(err)
 	iv := []byte("1234567890123456")
-	salt := CryptGen(CRYPTOR_BLOCK_SIZE)
-	plaintext = append(salt, plaintext)
+	salt := CryptGen(CRYPTOR_KEY_SIZE)
+	plaintext = append(salt, plaintext...)
 	encrypter := cipher.NewCBCEncrypter(block, iv)
 	padded := pkcs5pad(plaintext, encrypter.BlockSize())
 	encrypter.CryptBlocks(padded, padded)
@@ -69,5 +69,6 @@ func (c *Cryptor) Decrypt(ciphertext []byte) []byte {
 	decrypter := cipher.NewCBCDecrypter(block, iv)
 	decrypter.CryptBlocks(ciphertext, ciphertext)
 	trimmed := pkcs5trim(ciphertext, decrypter.BlockSize())
+	trimmed = trimmed[CRYPTOR_KEY_SIZE:]
 	return trimmed
 }
