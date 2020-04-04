@@ -10,7 +10,7 @@ cmd_golang() {
 }
 
 cmd_test() {
-  cmd_golang go test ./server "$@" # ./pipe ./server ./util ./util/queue ./test "$@"
+  cmd_golang go test ./pipe ./server ./util ./util/queue ./test "$@"
 }
 
 cmd_curl_test() {
