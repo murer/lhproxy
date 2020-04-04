@@ -28,5 +28,6 @@ func TestPipe(t *testing.T) {
 		Reader: lr,
 		Writer: rw,
 	}
-	p.Execute()
+	go p.Execute()
+	lw.Write([]byte{1,2}}
 }
