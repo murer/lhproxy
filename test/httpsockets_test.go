@@ -12,7 +12,7 @@ func TestSockets(t *testing.T) {
 	svr := httptest.NewServer(http.HandlerFunc(server.Handle))
 	defer svr.Close()
 	scks := &server.HttpSockets{
-
+		URL: server.URL,
 	}
 	SocksTest(t, scks)
 }
