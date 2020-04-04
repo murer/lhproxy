@@ -162,8 +162,7 @@ func (scks *NativeSockets) Read(id string, max int) []byte {
 	n, err := c.conn.Read(buf)
 	derr := DescError(err)
 	if derr == DESC_ERR_EOF {
-		log.Printf("[%s] Socket EOF, Closing...", c.id)
-		c.conn.Close()
+		log.Printf("[%s] Socket EOF...", c.id)
 		return nil
 	}
 	if derr != DESC_ERR_TIMEOUT {
