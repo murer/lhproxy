@@ -30,7 +30,9 @@ func ReplyServer(scks Sockets, listenId string) {
 				defer scks.Close(sckid, CLOSE_SCK)
 				for true {
 					data := scks.Read(sckid, 16 * 1204)
-					log.Printf("Reply: %v", data)
+					if data == nil {
+						 scks.Close(sckid, CLOSE_OUT)
+					}
 					scks.Write(sckid, data, CLOSE_NONE)
 				}
 			}()
