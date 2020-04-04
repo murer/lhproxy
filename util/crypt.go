@@ -8,7 +8,8 @@ import (
 	"crypto/cipher"
 )
 
-const CRYPTOR_BLOCK_SIZE = 16
+const CRYPTOR_KEY_SIZE = 32
+const CRYPTOR_BLOCK_SIZE = aes.BlockSize
 
 func pkcs5pad(plaintext []byte, blockSize int) []byte {
 	plaintextLen := len(plaintext)
@@ -38,11 +39,12 @@ func (c *Cryptor) BlockSize() int {
 }
 
 func (c *Cryptor) Gen() []byte {
-	key := make([]byte, CRYPTOR_BLOCK_SIZE)
+	key := make([]byte, CRYPTOR_KEY_SIZE)
 	n, err := rand.Read(key)
+	log.Printf("aaaaaaaa: %d", n)
 	Check(err)
-	if n != CRYPTOR_BLOCK_SIZE {
-		log.Panicf("wrong: %d, expected: %d", n, CRYPTOR_BLOCK_SIZE)
+	if n != CRYPTOR_KEY_SIZE {
+		log.Panicf("wrong: %d, expected: %d", n, CRYPTOR_KEY_SIZE)
 	}
 	return key
 }
@@ -56,8 +58,8 @@ func (c *Cryptor) Encrypt(plaintext []byte) []byte {
 	block, err := aes.NewCipher(c.Secret)
 	Check(err)
 	iv := []byte("1234567890123456")
-	log.Printf("xxx %d - %d", c.BlockSize(), len(iv))
 	encrypter := cipher.NewCBCEncrypter(block, iv)
+	log.Printf("OOOO %d", encrypter.BlockSize())
 	padded := pkcs5pad(plaintext, c.BlockSize())
 	encrypter.CryptBlocks(padded, padded)
 	return padded
@@ -67,7 +69,6 @@ func (c *Cryptor) Decrypt(ciphertext []byte) []byte {
 	block, err := aes.NewCipher(c.Secret)
 	Check(err)
 	iv := []byte("1234567890123456")
-	log.Printf("xxx %d - %d", c.BlockSize(), len(iv))
 	decrypter := cipher.NewCBCDecrypter(block, iv)
 	decrypter.CryptBlocks(ciphertext, ciphertext)
 	trimmed := pkcs5trim(ciphertext, c.BlockSize())

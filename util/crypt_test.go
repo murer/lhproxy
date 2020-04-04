@@ -15,7 +15,7 @@ func TestPKCS5(t *testing.T) {
 func TestEncrypt(t *testing.T) {
 	plaintext := []byte{5, 6, 7}
 	cryptor := &Cryptor{}
-	assert.Equal(t, CRYPTOR_BLOCK_SIZE, len(cryptor.GenSecret()))
+	assert.Equal(t, CRYPTOR_KEY_SIZE, len(cryptor.GenSecret()))
 	c1 := cryptor.Encrypt(plaintext)
 	c2 := cryptor.Encrypt(plaintext)
 	assert.NotEqual(t, plaintext, c1)
