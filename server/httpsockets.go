@@ -1,15 +1,17 @@
 package server
 
 import (
-	
+
 )
 
 type HttpSockets struct {
 	URL string
 }
 
-func Send(msg *Message) *Message {
-		return nil
+func Send(mreq *Message) *Message {
+	breq := MessageEnc(mreq)
+	resp, err := http.Post(url, "application/octet-stream", &breq)
+	
 }
 
 func (scks *HttpSockets) Listen(addr string) string {
