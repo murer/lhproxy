@@ -87,7 +87,7 @@ func HandleMessageConnect(req *Message) *Message {
 }
 
 func HandleMessageWrite(req *Message) *Message {
-	scks.Write(req.Get("sckid"), req.Payload, req.GetInt("resources"))
+	scks.Write(req.Get("sckid"), req.Payload, req.GetInt("crsrc"))
 	return &Message{Name: "resp/ok"}
 }
 
