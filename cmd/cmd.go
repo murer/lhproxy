@@ -6,13 +6,16 @@ import (
 	"runtime"
 	"github.com/spf13/cobra"
 
-	"github.com/murer/lhproxy/client"
+	"github.com/murer/lhproxy/pipe"
+	"github.com/murer/lhproxy/sockets"
 	"github.com/murer/lhproxy/server"
 
 	"github.com/murer/lhproxy/util"
 )
 
 var rootCmd *cobra.Command
+var clientCmd *cobra.Command
+var pipeCmd *cobra.Command
 
 func Config() {
 	rootCmd = &cobra.Command{
@@ -29,7 +32,14 @@ func Config() {
 	})
 
 	configServer()
-	configClient()
+
+	clientCmd = &cobra.Command{Use:"client"}
+	rootCmd.AddCommand(clientCmd)
+
+	pipeCmd = &cobra.Command{Use:"pipe"}
+	clientCmd.AddCommand(pipeCmd)
+
+	configPipeNative()
 }
 
 func configServer() {
@@ -42,21 +52,18 @@ func configServer() {
 	})
 }
 
-func configClient() {
-	clientCmd := &cobra.Command{Use:"client"}
-	rootCmd.AddCommand(clientCmd)
-
-	clientCmd.AddCommand(&cobra.Command{
-		Use: "pipe <lhproxy:port> <host>:<port>",
-		Args: cobra.ExactArgs(2),
+func configPipeNative() {
+	pipeCmd.AddCommand(&cobra.Command{
+		Use: "native <host>:<port>",
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			pipe := &client.Pipe{
-				RAddress: args[1],
-				LHAddress: args[0],
-				LReader: os.Stdin,
-				LWriter: os.Stdout,
+			p := &pipe.Pipe{
+				Scks: sockets.GetNative(),
+				Address: args[0],
+				Reader: os.Stdin,
+				Writer: os.Stdout,
 			}
-			pipe.Execute()
+			p.Execute()
 			return nil
 		},
 	})
