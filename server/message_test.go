@@ -6,10 +6,13 @@ import (
 )
 
 func TestMessage(t *testing.T) {
-    msg := &Message{
+    original := &Message{
         Name: "n",
         Headers: map[string]string{"foo": "1", "bar": "2"},
-        Payload: []byte{1,2,3},
+        Payload: []byte{1,2},
     }
-    assert.Equal(t, "x", msg)
+		buf := MessageEnc(original)
+		t.Logf("message %d: %s", len(buf), buf)
+		msg := MessageDec(buf)
+    assert.Equal(t, original, msg)
 }
