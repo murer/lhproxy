@@ -1,7 +1,11 @@
 package server
 
-type HttpSockets struct {
+import (
+	
+)
 
+type HttpSockets struct {
+	URL string
 }
 
 func Send(msg *Message) *Message {
