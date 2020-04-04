@@ -11,8 +11,8 @@ import (
 
 func TestPipe(t *testing.T) {
 	scks := &sockets.NativeSockets{
-		ReadTimeout: 1 * time.Millisecond,
-		AcceptTimeout: 1 * time.Millisecond,
+		ReadTimeout: 3000 * time.Millisecond,
+		AcceptTimeout: 3000 * time.Millisecond,
 	}
 	lr, lw := io.Pipe()
 	defer lw.Close()
@@ -23,6 +23,8 @@ func TestPipe(t *testing.T) {
 
 	sckid := scks.Listen("localhost:5001")
 	defer scks.Close(sckid, sockets.CLOSE_SCK)
+	go sockets.ReplyServer(scks, sckid)
+
 	p := &Pipe{
 		Scks: scks,
 		Address: "localhost:5001",

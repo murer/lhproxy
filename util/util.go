@@ -33,3 +33,11 @@ func ReadFully(r io.Reader, n int) []byte {
 	}
 	return buf
 }
+
+func WriteFully(w io.Writer, buf []byte) {
+	nr, err := w.Write(buf)
+	Check(err)
+	if nr != len(buf) {
+		log.Panicf("wrong %d, expected %d", nr ,len(buf))
+	}
+}
