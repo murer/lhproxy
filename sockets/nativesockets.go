@@ -77,6 +77,7 @@ var native = &NativeSockets{
 }
 
 func (scks *NativeSockets) Listen(addr string) string {
+	log.Printf("xxxxxxx %s", addr)
 	ln, err := net.Listen("tcp", addr)
 	util.Check(err)
 	l := &listenerWrapper{

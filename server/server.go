@@ -10,8 +10,12 @@ import (
 
 var scks sockets.Sockets
 
+func SetSockets(x sockets.Sockets) {
+	scks = x
+}
+
 func Start() {
-	scks = sockets.GetNative()
+	SetSockets(sockets.GetNative())
 	http.HandleFunc("/", Handle)
 	log.Printf("Starting server")
 	err := http.ListenAndServe("0.0.0.0:8080", nil)
@@ -40,6 +44,7 @@ func HandleSockets(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleMessage(req *Message) *Message {
+	// log.Printf("uuuuuuuuuu %#v", scks)
 	if req.Name == "scks/listen" {
 		return HandleMessageListen(req)
 	} else if req.Name == "scks/accept" {
@@ -60,7 +65,6 @@ func HandleMessage(req *Message) *Message {
 
 func HandleMessageListen(req *Message) *Message {
 	sckid := scks.Listen(req.Get("addr"))
-	log.Printf("uuuuuuuuuu")
 	return &Message{
 		Name: "resp/ok",
 		Headers: map[string]string{"sckid": sckid},

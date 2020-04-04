@@ -9,6 +9,7 @@ import (
 )
 
 func TestSockets(t *testing.T) {
+	server.SetSockets(GetNative())
 	svr := httptest.NewServer(http.HandlerFunc(server.Handle))
 	defer svr.Close()
 	scks := &server.HttpSockets{
