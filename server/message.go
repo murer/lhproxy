@@ -7,9 +7,9 @@ import (
 )
 
 type Message struct {
-	Name string `json:"name"`
-	Headers map[string]string `json:"headers`
-	Payload []byte `json:"payload"`
+	Name string
+	Headers map[string]string
+	Payload []byte
 }
 
 func (m *Message) Get(name string) string {
@@ -30,9 +30,6 @@ func rawMessageEnc(msg *Message) []byte {
 	if msg.Headers == nil {
 		msg.Headers = map[string]string{}
 	}
-	if msg.Payload == nil {
-		msg.Payload = []byte{}
-	}
 	b := util.NewBinary([]byte{})
 	b.WriteString(msg.Name)
 	b.WriteUInt16(uint16(len(msg.Headers)))
@@ -40,7 +37,7 @@ func rawMessageEnc(msg *Message) []byte {
 		b.WriteString(key)
 		b.WriteString(value)
 	}
-	b.WriteBytes(msg.Payload)
+	b.WriteNillableBytes(msg.Payload)
 	ret := b.Bytes()
 	// log.Printf("WRITE %x", ret)
 	return ret
@@ -56,7 +53,7 @@ func rawMessageDec(buf []byte) *Message {
 		value := b.ReadString()
 		ret.Headers[key] = value
 	}
-	ret.Payload = b.ReadBytes()
+	ret.Payload = b.ReadNillableBytes()
 	// log.Printf("READ %v", ret)
 	return ret
 }
