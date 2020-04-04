@@ -27,31 +27,27 @@ func pkcs5trim(ciphertext []byte, blockSize int) []byte {
 	return ciphertext[:ciphertextLen-paddingLen]
 }
 
-type Cryptor struct {
-	Secret []byte
-}
-
-func (c *Cryptor) BlockSize() int {
-	if c.Secret == nil || len(c.Secret) == 0 {
-		log.Panic("Cryptor is not ready")
-	}
-	return len(c.Secret)
-}
-
-func (c *Cryptor) Gen() []byte {
-	key := make([]byte, CRYPTOR_KEY_SIZE)
+func CryptGen(size int) []byte {
+	key := make([]byte, size)
 	n, err := rand.Read(key)
-	log.Printf("aaaaaaaa: %d", n)
 	Check(err)
-	if n != CRYPTOR_KEY_SIZE {
+	if n != size {
 		log.Panicf("wrong: %d, expected: %d", n, CRYPTOR_KEY_SIZE)
 	}
 	return key
 }
 
+type Cryptor struct {
+	Secret []byte
+}
+
 func (c *Cryptor) GenSecret() []byte {
-	c.Secret = c.Gen()
+	c.Secret = CryptGen(CRYPTOR_KEY_SIZE)
 	return c.Secret
+}
+
+func (c *Cryptor) GenIV() []byte {
+	return CryptGen(CRYPTOR_BLOCK_SIZE)
 }
 
 func (c *Cryptor) Encrypt(plaintext []byte) []byte {
@@ -60,7 +56,7 @@ func (c *Cryptor) Encrypt(plaintext []byte) []byte {
 	iv := []byte("1234567890123456")
 	encrypter := cipher.NewCBCEncrypter(block, iv)
 	log.Printf("OOOO %d", encrypter.BlockSize())
-	padded := pkcs5pad(plaintext, c.BlockSize())
+	padded := pkcs5pad(plaintext, encrypter.BlockSize())
 	encrypter.CryptBlocks(padded, padded)
 	return padded
 }
@@ -71,6 +67,6 @@ func (c *Cryptor) Decrypt(ciphertext []byte) []byte {
 	iv := []byte("1234567890123456")
 	decrypter := cipher.NewCBCDecrypter(block, iv)
 	decrypter.CryptBlocks(ciphertext, ciphertext)
-	trimmed := pkcs5trim(ciphertext, c.BlockSize())
+	trimmed := pkcs5trim(ciphertext, decrypter.BlockSize())
 	return trimmed
 }
