@@ -1,7 +1,7 @@
 package server
 
 import (
-	"encoding/json"
+	json "encoding/glob"
 	"log"
 	"strconv"
 	"github.com/murer/lhproxy/util"
