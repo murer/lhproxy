@@ -6,18 +6,18 @@ import (
 	"fmt"
 	"strings"
 	"time"
-	"io"
+	// "io"
 
 	"github.com/murer/lhproxy/util"
 	"github.com/murer/lhproxy/util/queue"
 )
 
-const BUFFER_SIZE = 100 * 1024
+// const BUFFER_SIZE = 100 * 1024
+const READ_DEADLINE = 1 * time.Second
 
 type connWrapper struct {
 	id string
 	conn net.Conn
-	reader *queue.Queue
 	lastUsed int64
 	eof bool
 }
@@ -26,33 +26,33 @@ func (c *connWrapper) Close() {
 	c.conn.Close()
 }
 
-func (c *connWrapper) startReading() {
-	log.Printf("Starting reading conn: %s", c.id)
-	buf := make([]byte, 8 * 1024)
-	for true {
-		n, err := c.conn.Read(buf)
-		if err != nil {
-			if strings.Contains(err.Error(), "use of closed network connection") {
-				return
-			} else if err == io.EOF {
-				c.reader.Put("EOF")
-	      return
-	    }
-			util.Check(err)
-		}
-		ret := make([]interface{}, n)
-		for i := 0; i < n; i++ {
-			ret[i] = buf[i]
-		}
-		log.Printf("Caching read %s: %x", c.id, len(ret))
-		if n > 0 {
-			c.reader.Put(ret...)
-		}
-		if n < 0 {
-			panic(n)
-		}
-	}
-}
+// func (c *connWrapper) startReading() {
+// 	log.Printf("Starting reading conn: %s", c.id)
+// 	buf := make([]byte, 8 * 1024)
+// 	for true {
+// 		n, err := c.conn.Read(buf)
+// 		if err != nil {
+// 			if strings.Contains(err.Error(), "use of closed network connection") {
+// 				return
+// 			} else if err == io.EOF {
+// 				c.reader.Put("EOF")
+// 	      return
+// 	    }
+// 			util.Check(err)
+// 		}
+// 		ret := make([]interface{}, n)
+// 		for i := 0; i < n; i++ {
+// 			ret[i] = buf[i]
+// 		}
+// 		log.Printf("Caching read %s: %x", c.id, len(ret))
+// 		if n > 0 {
+// 			c.reader.Put(ret...)
+// 		}
+// 		if n < 0 {
+// 			panic(n)
+// 		}
+// 	}
+// }
 
 type listenerWrapper struct {
 	id string
@@ -86,12 +86,10 @@ func (l *listenerWrapper) startAccepts() {
 		c := &connWrapper{
 			id: fmt.Sprintf("conn://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String()),
 			conn: conn,
-			reader: queue.New(BUFFER_SIZE),
 			eof: false,
 			lastUsed: time.Now().Unix(),
 		}
 		log.Printf("Caching accepted conn: %s", c.id)
-		go c.startReading()
 		l.queue.Put(c)
 	}
 }
@@ -136,12 +134,10 @@ func (scks *NativeSockets) Connect(addr string) string {
 	c := &connWrapper{
 		id: fmt.Sprintf("conn://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String()),
 		conn: conn,
-		reader: queue.New(BUFFER_SIZE),
 		eof: false,
 		lastUsed: time.Now().Unix(),
 	}
 	conns[c.id] = c
-	go c.startReading()
 	log.Printf("Connected: %s", c.id)
 	return c.id
 }
@@ -167,23 +163,14 @@ func (scks *NativeSockets) Read(id string, max int) []byte {
 	if c.eof {
 		return nil
 	}
-	buf := c.reader.Shiftn(max)
-	ret := make([]byte, len(buf))
-	for i := 0; i < len(buf); i++ {
-		switch v := buf[i].(type) {
-			case string:
-				c.eof = true
-				continue
-			default:
-				ret[i] = v.(byte)
-		}
-	}
-	if c.eof {
-		ret = ret[:len(ret)-1]
-	}
-	if c.eof && len(ret) == 0 {
+	ret := make([]byte, max)
+	n, err := c.conn.Read(ret)
+	util.Check(err)
+	if c.eof && n == 0 {
+		log.Printf("Read EOF %s", c.id)
 		ret = nil
 	}
+	ret = ret[:n]
 	log.Printf("Read %s: %d", c.id, len(ret))
 	return ret
 }
