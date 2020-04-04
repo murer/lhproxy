@@ -31,7 +31,7 @@ func DescError(err error) int {
 
 type connWrapper struct {
 	id string
-	conn net.Conn
+	conn *net.TCPConn
 	lastUsed int64
 }
 
@@ -59,7 +59,7 @@ func (l *listenerWrapper) accept(timeout time.Duration) *connWrapper {
 	util.Check(err)
 	c := &connWrapper{
 		id: fmt.Sprintf("conn://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String()),
-		conn: conn,
+		conn: conn.(*net.TCPConn),
 		lastUsed: time.Now().Unix(),
 	}
 	return c
@@ -108,7 +108,7 @@ func (scks *NativeSockets) Connect(addr string) string {
 	util.Check(err)
 	c := &connWrapper{
 		id: fmt.Sprintf("conn://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String()),
-		conn: conn,
+		conn: conn.(*net.TCPConn),
 		lastUsed: time.Now().Unix(),
 	}
 	conns[c.id] = c
@@ -119,15 +119,27 @@ func (scks *NativeSockets) Connect(addr string) string {
 func (scks *NativeSockets) Close(id string, resources int) {
 	l := lns[id]
 	if l != nil {
-		log.Printf("[%s] Closing listen", l.id)
-		delete(lns, l.id)
-		l.Close()
+		if resources == CLOSE_SCK {
+			log.Printf("[%s] Closing listen", l.id)
+			delete(lns, l.id)
+			l.Close()
+		}
 	}
 	c := conns[id]
 	if c != nil {
-		log.Printf("[%s] Closing connection", c.id)
-		delete(conns, c.id)
-		c.Close()
+		if resources == CLOSE_IN {
+			log.Printf("[%s] Closing conn reader", c.id)
+			c.conn.CloseRead()
+		}
+		if resources == CLOSE_OUT {
+			log.Printf("[%s] Closing conn writer", c.id)
+			c.conn.CloseWrite()
+		}
+		if resources == CLOSE_SCK {
+			log.Printf("[%s] Closing conn socket", c.id)
+			delete(conns, c.id)
+			c.Close()
+		}
 	}
 }
 
@@ -150,7 +162,7 @@ func (scks *NativeSockets) Read(id string, max int) []byte {
 	return buf
 }
 
-func (scks *NativeSockets) Write(id string, data []byte, closeOut bool) {
+func (scks *NativeSockets) Write(id string, data []byte, close int) {
 	c := conns[id]
 	c.lastUsed = time.Now().Unix()
 	log.Printf("[]%s] Write: %d", c.id, len(data))
@@ -159,6 +171,7 @@ func (scks *NativeSockets) Write(id string, data []byte, closeOut bool) {
 	if n != len(data) {
 		log.Panicf("[%s] Wrong: %d, should was: %d", c.id, n, len(data))
 	}
+	scks.Close(id, close)
 }
 
 func GetNative() Sockets {

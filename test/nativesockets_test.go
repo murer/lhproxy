@@ -36,14 +36,14 @@ func SocksTest(t *testing.T, scks sockets.Sockets) {
 	defer scks.Close(cs2, sockets.CLOSE_SCK)
 
 	assert.Equal(t, []byte{}, scks.Read(cs1, 2))
-	scks.Write(cc1, []byte{5, 6, 7}, false)
+	scks.Write(cc1, []byte{5, 6, 7}, sockets.CLOSE_NONE)
 	time.Sleep(100 * time.Millisecond)
 	assert.Equal(t, []byte{5, 6}, scks.Read(cs1, 2))
 	assert.Equal(t, []byte{7}, scks.Read(cs1, 2))
 	assert.Equal(t, []byte{}, scks.Read(cs1, 2))
 
 	assert.Equal(t, []byte{}, scks.Read(cc1, 2))
-	scks.Write(cs1, []byte{5, 6, 7}, false)
+	scks.Write(cs1, []byte{5, 6, 7}, sockets.CLOSE_NONE)
 	time.Sleep(100 * time.Millisecond)
 	assert.Equal(t, []byte{5, 6}, scks.Read(cc1, 2))
 	assert.Equal(t, []byte{7}, scks.Read(cc1, 2))
@@ -53,6 +53,13 @@ func SocksTest(t *testing.T, scks sockets.Sockets) {
 	time.Sleep(100 * time.Millisecond)
 	assert.Nil(t, scks.Read(cs1, 2))
 	assert.Nil(t, scks.Read(cs1, 2))
+
+	scks.Write(cs2, []byte{1, 2}, sockets.CLOSE_OUT)
+	assert.Equal(t, []byte{1, 2}, scks.Read(cc2, 2))
+	assert.Nil(t, scks.Read(cc2, 2))
+	assert.Equal(t, []byte{}, scks.Read(cs2, 2))
+	scks.Close(cc2, sockets.CLOSE_SCK)
+	assert.Nil(t, scks.Read(cs2, 2))
 }
 
 func TestNativeSockets(t *testing.T) {
