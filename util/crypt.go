@@ -39,8 +39,11 @@ func (c *Cryptor) BlockSize() int {
 
 func (c *Cryptor) Gen() []byte {
 	key := make([]byte, CRYPTOR_BLOCK_SIZE)
-	_, err := rand.Read(key)
+	n, err := rand.Read(key)
 	Check(err)
+	if n != CRYPTOR_BLOCK_SIZE {
+		log.Panicf("wrong: %d, expected: %d", n, CRYPTOR_BLOCK_SIZE)
+	}
 	return key
 }
 
