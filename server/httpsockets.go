@@ -38,10 +38,10 @@ func (scks *HttpSockets) Close(id string) {
   })
 }
 
-func (scks *HttpSockets) Read(id string, max int) []byte {
+func (scks *HttpSockets) Read(sckid string, max int) []byte {
   resp := Send(&Message{
       Name: "scks/read", 
-      Headers: map[string]string{"sckid": sckid},
+      Headers: map[string]string{"sckid": sckid,"max":string(max)},
   })
   return resp.Payload
 }
