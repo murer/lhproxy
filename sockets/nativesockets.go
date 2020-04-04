@@ -162,7 +162,8 @@ func (scks *NativeSockets) Read(id string, max int) []byte {
 	n, err := c.conn.Read(buf)
 	derr := DescError(err)
 	if derr == DESC_ERR_EOF {
-		log.Printf("Read EOF %s", c.id)
+		log.Printf("[%s] Socket EOF, Closing...", c.id)
+		c.conn.Close()
 		return nil
 	}
 	if derr != DESC_ERR_TIMEOUT {
@@ -178,10 +179,12 @@ func (scks *NativeSockets) Write(id string, data []byte, close int) {
 	c := conns[id]
 	c.lastUsed = time.Now().Unix()
 	log.Printf("[]%s] Write: %d", c.id, len(data))
-	n, err := c.conn.Write(data)
-	util.Check(err)
-	if n != len(data) {
-		log.Panicf("[%s] Wrong: %d, should was: %d", c.id, n, len(data))
+	if len(data) > 0 {
+		n, err := c.conn.Write(data)
+		util.Check(err)
+		if n != len(data) {
+			log.Panicf("[%s] Wrong: %d, should was: %d", c.id, n, len(data))
+		}
 	}
 	scks.Close(id, close)
 }
