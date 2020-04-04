@@ -11,9 +11,6 @@ import (
 	"github.com/murer/lhproxy/util"
 )
 
-const READ_DEADLINE = 1 * time.Second
-const ACCEPT_DEADLINE = 1 * time.Second
-
 const DESC_ERR_NONE = 0
 const DESC_ERR_OTHER = 1
 const DESC_ERR_EOF = 2
@@ -53,12 +50,11 @@ func (l *listenerWrapper) Close() {
 	l.ln.Close()
 }
 
-func (l *listenerWrapper) accept() *connWrapper {
-	l.ln.(*net.TCPListener).SetDeadline(time.Now().Add(ACCEPT_DEADLINE))
+func (l *listenerWrapper) accept(timeout time.Duration) *connWrapper {
+	l.ln.(*net.TCPListener).SetDeadline(time.Now().Add(timeout))
 	conn, err := l.ln.Accept()
 	derr := DescError(err)
 	if derr == DESC_ERR_TIMEOUT {
-		log.Printf("[%s] No connections to be accepted", l.id)
 		return nil
 	}
 	util.Check(err)
@@ -67,34 +63,19 @@ func (l *listenerWrapper) accept() *connWrapper {
 		conn: conn,
 		lastUsed: time.Now().Unix(),
 	}
-	log.Printf("[%s] Accepted connection", c.id)
 	return c
 }
 
-// func (l *listenerWrapper) startAccepts() {
-// 	log.Printf("[%s] Starting accepts", l.id)
-// 	for true {
-// 		conn, err := l.ln.Accept()
-// 		if err != nil {
-// 			if strings.Contains(err.Error(), "use of closed network connection") {
-// 				return
-// 			}
-// 			util.Check(err)
-// 		}
-// 		c := &connWrapper{
-// 			id: fmt.Sprintf("conn://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String()),
-// 			conn: conn,
-// 			lastUsed: time.Now().Unix(),
-// 		}
-// 		log.Printf("[%s] Caching accepted conn", c.id)
-// 		l.queue.Put(c)
-// 	}
-// }
-
 var lns = make(map[string]*listenerWrapper)
 var conns = make(map[string]*connWrapper)
-type NativeSockets struct {}
-var native = &NativeSockets{}
+type NativeSockets struct {
+	ReadTimeout time.Duration
+	AcceptTimeout time.Duration
+}
+var native = &NativeSockets{
+	ReadTimeout: 30 * time.Second,
+	AcceptTimeout: 30 * time.Second,
+}
 
 func (scks *NativeSockets) Listen(addr string) string {
 	ln, err := net.Listen("tcp", addr)
@@ -113,7 +94,7 @@ func (scks *NativeSockets) Accept(name string) string {
 	l := lns[name]
 	l.lastUsed = time.Now().Unix()
 	log.Printf("[%s] Accepting", l.id)
-	conn := l.accept()
+	conn := l.accept(scks.AcceptTimeout)
 	if conn == nil {
 		log.Printf("[%s] No connection accepted", l.id)
 		return ""
@@ -154,7 +135,7 @@ func (scks *NativeSockets) Close(id string) {
 func (scks *NativeSockets) Read(id string, max int) []byte {
 	c := conns[id]
 	buf := make([]byte, max)
-	c.conn.SetReadDeadline(time.Now().Add(READ_DEADLINE))
+	c.conn.SetReadDeadline(time.Now().Add(scks.ReadTimeout))
 	n, err := c.conn.Read(buf)
 	derr := DescError(err)
 	if derr == DESC_ERR_EOF {

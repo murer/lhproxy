@@ -56,5 +56,9 @@ func SocksTest(t *testing.T, scks sockets.Sockets) {
 }
 
 func TestNativeSockets(t *testing.T) {
-	SocksTest(t, sockets.GetNative())
+	native := &sockets.NativeSockets{
+		ReadTimeout: 1 * time.Millisecond,
+		AcceptTimeout: 1 * time.Millisecond,
+	}
+	SocksTest(t, native)
 }
