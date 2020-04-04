@@ -55,7 +55,6 @@ func (c *Cryptor) Encrypt(plaintext []byte) []byte {
 	Check(err)
 	iv := []byte("1234567890123456")
 	encrypter := cipher.NewCBCEncrypter(block, iv)
-	log.Printf("OOOO %d", encrypter.BlockSize())
 	padded := pkcs5pad(plaintext, encrypter.BlockSize())
 	encrypter.CryptBlocks(padded, padded)
 	return padded
