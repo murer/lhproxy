@@ -1,7 +1,6 @@
 package server
 
 import (
-	"encoding/json"
 	"log"
 	"strconv"
 	"github.com/murer/lhproxy/util"
@@ -28,14 +27,37 @@ func (m *Message) GetInt(name string) int {
 }
 
 func rawMessageEnc(msg *Message) []byte {
-	buf, err := json.Marshal(msg)
-	util.Check(err)
-	return buf
+	if msg.Headers == nil {
+		msg.Headers = map[string]string{}
+	}
+	if msg.Payload == nil {
+		msg.Payload = []byte{}
+	}
+	b := util.NewBinary([]byte{})
+	b.WriteString(msg.Name)
+	b.WriteUInt16(uint16(len(msg.Headers)))
+	for key, value := range msg.Headers {
+		b.WriteString(key)
+		b.WriteString(value)
+	}
+	b.WriteBytes(msg.Payload)
+	ret := b.Bytes()
+	// log.Printf("WRITE %x", ret)
+	return ret
 }
 
 func rawMessageDec(buf []byte) *Message {
-	ret := &Message{}
-	util.Check(json.Unmarshal(buf, ret))
+	ret := &Message{Headers:map[string]string{}}
+	b := util.NewBinary(buf)
+	ret.Name = b.ReadString()
+	mapLen := int(b.ReadUInt16())
+	for i := 0; i < mapLen; i++ {
+		key := b.ReadString()
+		value := b.ReadString()
+		ret.Headers[key] = value
+	}
+	ret.Payload = b.ReadBytes()
+	// log.Printf("READ %v", ret)
 	return ret
 }
 

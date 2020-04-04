@@ -7,13 +7,12 @@ import (
 
 func TestMessage(t *testing.T) {
 		original := &Message{
-				Name: "n",
+				Name: "nm",
 				Headers: map[string]string{"foo": "1", "bar": "2"},
 				Payload: []byte{1,2},
 		}
 		buf := MessageEnc(original)
-		t.Logf("message: %d", len(buf))
 		msg := MessageDec(buf)
 		assert.Equal(t, original, msg)
-		assert.Equal(t, 80, len(buf))
+		assert.Equal(t, 48, len(buf))
 }
