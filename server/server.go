@@ -44,19 +44,18 @@ func HandleSockets(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleMessage(req *Message) *Message {
-	// log.Printf("uuuuuuuuuu %#v", scks)
 	if req.Name == "scks/listen" {
 		return HandleMessageListen(req)
 	} else if req.Name == "scks/accept" {
-		// return HandleMessageAccept(req)
+		return HandleMessageAccept(req)
 	} else if req.Name == "scks/connect" {
-	// return HandleMessageConnect(req)
+		return HandleMessageConnect(req)
 	} else if req.Name == "scks/write" {
-	// return HandleMessageWrite(req)
+		return HandleMessageWrite(req)
 	} else if req.Name == "scks/read" {
-	// return HandleMessageRead(req)
+		return HandleMessageRead(req)
 	} else if req.Name == "scks/close" {
-	// return HandleMessageClose(req)
+		return HandleMessageClose(req)
 	} else {
 		log.Panicf("Unknown message %s", req.Name)
 	}
@@ -65,6 +64,46 @@ func HandleMessage(req *Message) *Message {
 
 func HandleMessageListen(req *Message) *Message {
 	sckid := scks.Listen(req.Get("addr"))
+	return &Message{
+		Name: "resp/ok",
+		Headers: map[string]string{"sckid": sckid},
+	}
+}
+
+func HandleMessageAccept(req *Message) *Message {
+	scks.Accept(req)
+	return &Message{
+		Name: "resp/ok",
+		Headers: map[string]string{"sckid": sckid},
+	}
+}
+
+func HandleMessageConnect(req *Message) *Message {
+	scks.Connect(req)
+	return &Message{
+		Name: "resp/ok",
+		Headers: map[string]string{"sckid": sckid},
+	}
+}
+
+func HandleMessageWrite(req *Message) *Message {
+	scks.Write(req)
+	return &Message{
+		Name: "resp/ok",
+		Headers: map[string]string{"sckid": sckid},
+	}
+}
+
+func HandleMessageRead(req *Message) *Message {
+	scks.Read(req)
+	return &Message{
+		Name: "resp/ok",
+		Headers: map[string]string{"sckid": sckid},
+	}
+}
+
+func HandleMessageClose(req *Message) *Message {
+	scks.Close(req)
 	return &Message{
 		Name: "resp/ok",
 		Headers: map[string]string{"sckid": sckid},
