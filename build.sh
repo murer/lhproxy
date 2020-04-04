@@ -2,8 +2,7 @@
 
 cmd_golang() {
   docker volume create lhproxy_golang_dev --label lhproxy_dev || true
-  docker rm lhproxy_golang_dev -f || true
-  docker run -it --rm --label lhproxy_dev --name lhproxy_golang_dev \
+  docker run -it --rm --label lhproxy_dev \
     --mount source=lhproxy_golang_dev,target=/go \
     -v "$(pwd)":/go/src -w /go/src \
     --network host \

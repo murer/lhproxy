@@ -39,20 +39,21 @@ func Config() {
 	pipeCmd = &cobra.Command{Use:"pipe"}
 	clientCmd.AddCommand(pipeCmd)
 
-	configPipeNative()
+	configPipe()
 }
 
 func configServer() {
 	rootCmd.AddCommand(&cobra.Command{
-		Use: "server",
+		Use: "server <host>:<port>",
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			server.Start()
+			server.Start(args[0])
 			return nil
 		},
 	})
 }
 
-func configPipeNative() {
+func configPipe() {
 	pipeCmd.AddCommand(&cobra.Command{
 		Use: "native <host>:<port>",
 		Args: cobra.ExactArgs(1),
@@ -60,6 +61,21 @@ func configPipeNative() {
 			p := &pipe.Pipe{
 				Scks: sockets.GetNative(),
 				Address: args[0],
+				Reader: os.Stdin,
+				Writer: os.Stdout,
+			}
+			p.Execute()
+			return nil
+		},
+	})
+
+	pipeCmd.AddCommand(&cobra.Command{
+		Use: "lhproxy <lhproxy:port> <host>:<port>",
+		Args: cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			p := &pipe.Pipe{
+				Scks: &server.HttpSockets{URL:args[0]},
+				Address: args[1],
 				Reader: os.Stdin,
 				Writer: os.Stdout,
 			}

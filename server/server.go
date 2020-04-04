@@ -14,11 +14,11 @@ func SetSockets(x sockets.Sockets) {
 	scks = x
 }
 
-func Start() {
+func Start(addr string) {
 	SetSockets(sockets.GetNative())
 	http.HandleFunc("/", Handle)
 	log.Printf("Starting server")
-	err := http.ListenAndServe("0.0.0.0:8080", nil)
+	err := http.ListenAndServe(addr, nil)
 	util.Check(err)
 }
 
