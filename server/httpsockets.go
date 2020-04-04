@@ -1,21 +1,32 @@
 package server
 
 import (
-
+	"net/http"
+	"bytes"
+	"log"
+	"io/ioutil"
+	"github.com/murer/lhproxy/util"
 )
 
 type HttpSockets struct {
 	URL string
 }
 
-func Send(mreq *Message) *Message {
+func (scks *HttpSockets) Send(mreq *Message) *Message {
 	breq := MessageEnc(mreq)
-	resp, err := http.Post(url, "application/octet-stream", &breq)
-	
+	resp, err := http.Post(scks.URL, "application/octet-stream", bytes.NewBuffer(breq))
+	util.Check(err)
+	if resp.StatusCode != 200 {
+		log.Panicf("resp: %s" + resp.Status)
+	}
+	bresp, err := ioutil.ReadAll(resp.Body)
+	util.Check(err)
+	mresp := MessageDec(bresp)
+	return mresp
 }
 
 func (scks *HttpSockets) Listen(addr string) string {
-	resp := Send(&Message{
+	resp := scks.Send(&Message{
 			Name: "scks/listen",
 			Headers: map[string]string{"addr": addr},
 	})
@@ -23,7 +34,7 @@ func (scks *HttpSockets) Listen(addr string) string {
 }
 
 func (scks *HttpSockets) Accept(sckid string) string {
-	resp := Send(&Message{
+	resp := scks.Send(&Message{
 			Name: "scks/accepet",
 			Headers: map[string]string{"sckid": sckid},
 	})
@@ -31,7 +42,7 @@ func (scks *HttpSockets) Accept(sckid string) string {
 }
 
 func (scks *HttpSockets) Connect(addr string) string {
-	resp := Send(&Message{
+	resp := scks.Send(&Message{
 			Name: "scks/connect",
 			Headers: map[string]string{"addr": addr},
 	})
@@ -39,14 +50,14 @@ func (scks *HttpSockets) Connect(addr string) string {
 }
 
 func (scks *HttpSockets) Close(sckid string, resources int) {
-	Send(&Message{
+	scks.Send(&Message{
 			Name: "scks/close",
 			Headers: map[string]string{"sckid": sckid, "crsrc": string(resources)},
 	})
 }
 
 func (scks *HttpSockets) Read(sckid string, max int) []byte {
-	resp := Send(&Message{
+	resp := scks.Send(&Message{
 			Name: "scks/read",
 			Headers: map[string]string{"sckid": sckid,"max":string(max)},
 	})
@@ -54,7 +65,7 @@ func (scks *HttpSockets) Read(sckid string, max int) []byte {
 }
 
 func (scks *HttpSockets) Write(sckid string, data []byte, resources int) {
-	Send(&Message{
+	scks.Send(&Message{
 			Name: "scks/write",
 			Headers: map[string]string{"sckid": sckid, "crsrc": string(resources)},
 			Payload: data,
