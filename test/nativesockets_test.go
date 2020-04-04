@@ -62,10 +62,10 @@ func SocksTest(t *testing.T, scks sockets.Sockets) {
 	assert.Nil(t, scks.Read(cs2, 2))
 }
 
-func TestNativeSockets(t *testing.T) {
-	native := &sockets.NativeSockets{
-		ReadTimeout: 1 * time.Millisecond,
-		AcceptTimeout: 1 * time.Millisecond,
-	}
-	SocksTest(t, native)
-}
+// func TestNativeSockets(t *testing.T) {
+// 	native := &sockets.NativeSockets{
+// 		ReadTimeout: 1 * time.Millisecond,
+// 		AcceptTimeout: 1 * time.Millisecond,
+// 	}
+// 	SocksTest(t, native)
+// }

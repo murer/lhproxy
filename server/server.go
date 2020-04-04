@@ -3,7 +3,7 @@ package server
 import (
 	"log"
 	"net/http"
-
+	"io/ioutil"
 	"github.com/murer/lhproxy/sockets"
 	"github.com/murer/lhproxy/util"
 )
@@ -20,15 +20,49 @@ func Start() {
 
 func Handle(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Access: %s %s %s", r.RemoteAddr, r.Method, r.URL)
-	if r.URL.Method == "GET" && r.URL.Path == "/version.txt" {
+	if r.Method == "GET" && r.URL.Path == "/version.txt" {
 		w.Write([]byte(util.Version))
-	} else if r.URL.Method == "POST" {
-		HandleSockets(w, e)
+	} else if r.Method == "POST" {
+		HandleSockets(w, r)
 	} else {
 		http.NotFound(w, r)
 	}
 }
 
 func HandleSockets(w http.ResponseWriter, r *http.Request) {
+	breq, err := ioutil.ReadAll(r.Body)
+	util.Check(err)
+	mreq := MessageDec(breq)
+	mresp := HandleMessage(mreq)
+	bresp := MessageEnc(mresp)
+	w.Header().Set("Content-Type", "application/octet-stream")
+	w.Write(bresp)
+}
 
+func HandleMessage(req *Message) *Message {
+	if req.Name == "scks/listen" {
+		return HandleMessageListen(req)
+	} else if req.Name == "scks/accept" {
+		// return HandleMessageAccept(req)
+	} else if req.Name == "scks/connect" {
+	// return HandleMessageConnect(req)
+	} else if req.Name == "scks/write" {
+	// return HandleMessageWrite(req)
+	} else if req.Name == "scks/read" {
+	// return HandleMessageRead(req)
+	} else if req.Name == "scks/close" {
+	// return HandleMessageClose(req)
+	} else {
+		log.Panicf("Unknown message %s", req.Name)
+	}
+	return nil
+}
+
+func HandleMessageListen(req *Message) *Message {
+	sckid := scks.Listen(req.Get("addr"))
+	log.Printf("uuuuuuuuuu")
+	return &Message{
+		Name: "resp/ok",
+		Headers: map[string]string{"sckid": sckid},
+	}
 }
