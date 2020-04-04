@@ -25,6 +25,9 @@ func ReplyServer(scks Sockets, listenId string) {
 	log.Printf("[%s] Starting ReplyServer", listenId)
 	for true {
 		sckid := scks.Accept(listenId)
+		if sckid == "err://closed" {
+			return
+		}
 		if sckid != "" {
 			go func() {
 				defer scks.Close(sckid, CLOSE_SCK)

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 	"io"
+	"strings"
 
 	"github.com/murer/lhproxy/util"
 )
@@ -14,6 +15,7 @@ const DESC_ERR_NONE = 0
 const DESC_ERR_OTHER = 1
 const DESC_ERR_EOF = 2
 const DESC_ERR_TIMEOUT = 3
+const DESC_ERR_CLOSED = 4
 
 func DescError(err error) int {
 	if err == nil {
@@ -25,6 +27,9 @@ func DescError(err error) int {
 	netErr, ok := err.(net.Error)
 	if ok && netErr.Timeout() {
 		return DESC_ERR_TIMEOUT
+	}
+	if strings.Contains(err.Error(), "use of closed network connection") {
+		return DESC_ERR_CLOSED
 	}
 	return DESC_ERR_OTHER
 }
@@ -49,12 +54,15 @@ func (l *listenerWrapper) Close() {
 	l.ln.Close()
 }
 
-func (l *listenerWrapper) accept(timeout time.Duration) *connWrapper {
+func (l *listenerWrapper) accept(timeout time.Duration) (*connWrapper, bool) {
 	l.ln.(*net.TCPListener).SetDeadline(time.Now().Add(timeout))
 	conn, err := l.ln.Accept()
 	derr := DescError(err)
 	if derr == DESC_ERR_TIMEOUT {
-		return nil
+		return nil, false
+	}
+	if derr == DESC_ERR_CLOSED {
+		return nil, true
 	}
 	util.Check(err)
 	c := &connWrapper{
@@ -62,7 +70,7 @@ func (l *listenerWrapper) accept(timeout time.Duration) *connWrapper {
 		conn: conn.(*net.TCPConn),
 		lastUsed: time.Now().Unix(),
 	}
-	return c
+	return c, false
 }
 
 var lns = make(map[string]*listenerWrapper)
@@ -93,7 +101,11 @@ func (scks *NativeSockets) Accept(name string) string {
 	l := lns[name]
 	l.lastUsed = time.Now().Unix()
 	log.Printf("[%s] Accepting", l.id)
-	conn := l.accept(scks.AcceptTimeout)
+	conn, closed := l.accept(scks.AcceptTimeout)
+	if closed {
+		log.Printf("[%s] Socket is closed to accept connection", l.id)
+		return "err://closed"
+	}
 	if conn == nil {
 		log.Printf("[%s] No connection accepted", l.id)
 		return ""
