@@ -4,15 +4,15 @@ import (
 	"log"
 	"net"
 	"fmt"
-	"strings"
+	// "strings"
 	"time"
 	"io"
 
 	"github.com/murer/lhproxy/util"
-	"github.com/murer/lhproxy/util/queue"
 )
 
 const READ_DEADLINE = 1 * time.Second
+const ACCEPT_DEADLINE = 1 * time.Second
 
 const DESC_ERR_NONE = 0
 const DESC_ERR_OTHER = 1
@@ -46,7 +46,6 @@ func (c *connWrapper) Close() {
 type listenerWrapper struct {
 	id string
 	ln net.Listener
-	queue *queue.Queue
 	lastUsed int64
 }
 
@@ -55,32 +54,42 @@ func (l *listenerWrapper) Close() {
 }
 
 func (l *listenerWrapper) accept() *connWrapper {
-	ret := l.queue.Shift()
-	if ret == nil {
+	l.ln.(*net.TCPListener).SetDeadline(time.Now().Add(ACCEPT_DEADLINE))
+	conn, err := l.ln.Accept()
+	derr := DescError(err)
+	if derr == DESC_ERR_TIMEOUT {
+		log.Printf("[%s] No connections to be accepted", l.id)
 		return nil
 	}
-	return ret.(*connWrapper)
+	util.Check(err)
+	c := &connWrapper{
+		id: fmt.Sprintf("conn://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String()),
+		conn: conn,
+		lastUsed: time.Now().Unix(),
+	}
+	log.Printf("[%s] Accepted connection", c.id)
+	return c
 }
 
-func (l *listenerWrapper) startAccepts() {
-	log.Printf("[%s] Starting accepts", l.id)
-	for true {
-		conn, err := l.ln.Accept()
-		if err != nil {
-			if strings.Contains(err.Error(), "use of closed network connection") {
-				return
-			}
-			util.Check(err)
-		}
-		c := &connWrapper{
-			id: fmt.Sprintf("conn://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String()),
-			conn: conn,
-			lastUsed: time.Now().Unix(),
-		}
-		log.Printf("[%s] Caching accepted conn", c.id)
-		l.queue.Put(c)
-	}
-}
+// func (l *listenerWrapper) startAccepts() {
+// 	log.Printf("[%s] Starting accepts", l.id)
+// 	for true {
+// 		conn, err := l.ln.Accept()
+// 		if err != nil {
+// 			if strings.Contains(err.Error(), "use of closed network connection") {
+// 				return
+// 			}
+// 			util.Check(err)
+// 		}
+// 		c := &connWrapper{
+// 			id: fmt.Sprintf("conn://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String()),
+// 			conn: conn,
+// 			lastUsed: time.Now().Unix(),
+// 		}
+// 		log.Printf("[%s] Caching accepted conn", c.id)
+// 		l.queue.Put(c)
+// 	}
+// }
 
 var lns = make(map[string]*listenerWrapper)
 var conns = make(map[string]*connWrapper)
@@ -93,10 +102,8 @@ func (scks *NativeSockets) Listen(addr string) string {
 	l := &listenerWrapper{
 		ln: ln,
 		id: fmt.Sprintf("listen://%s", ln.Addr().String()),
-		queue: queue.New(1),
 		lastUsed: time.Now().Unix(),
 	}
-	go l.startAccepts()
 	lns[l.id] = l
 	log.Printf("[%s] Listening", l.id)
 	return l.id
