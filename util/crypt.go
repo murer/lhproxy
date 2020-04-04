@@ -53,8 +53,8 @@ func (c *Cryptor) GenIV() []byte {
 func (c *Cryptor) Encrypt(plaintext []byte) []byte {
 	block, err := aes.NewCipher(c.Secret)
 	Check(err)
-	iv := []byte("1234567890123456")
-	salt := CryptGen(CRYPTOR_KEY_SIZE)
+	salt := CryptGen(CRYPTOR_BLOCK_SIZE)
+	iv := SHA256(salt)[:CRYPTOR_BLOCK_SIZE]
 	plaintext = append(salt, plaintext...)
 	encrypter := cipher.NewCBCEncrypter(block, iv)
 	padded := pkcs5pad(plaintext, encrypter.BlockSize())
@@ -65,10 +65,14 @@ func (c *Cryptor) Encrypt(plaintext []byte) []byte {
 func (c *Cryptor) Decrypt(ciphertext []byte) []byte {
 	block, err := aes.NewCipher(c.Secret)
 	Check(err)
-	iv := []byte("1234567890123456")
+	salt := ciphertext[:CRYPTOR_BLOCK_SIZE]
+	iv := SHA256(salt)[:CRYPTOR_BLOCK_SIZE]
 	decrypter := cipher.NewCBCDecrypter(block, iv)
 	decrypter.CryptBlocks(ciphertext, ciphertext)
 	trimmed := pkcs5trim(ciphertext, decrypter.BlockSize())
-	trimmed = trimmed[CRYPTOR_KEY_SIZE:]
+	if ! bytes.Equal(trimmed[:CRYPTOR_BLOCK_SIZE], salt) {
+		log.Panicf("It is wrong salted")
+	}
+	trimmed = trimmed[CRYPTOR_BLOCK_SIZE:]
 	return trimmed
 }

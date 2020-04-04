@@ -24,6 +24,6 @@ func TestEncrypt(t *testing.T) {
 	assert.Equal(t, plaintext, cryptor.Decrypt(c1))
 	assert.Equal(t, plaintext, cryptor.Decrypt(c2))
 
-	assert.Equal(t, 48, len(c1))
-	assert.Equal(t, 48, len(c2))
+	assert.Equal(t, 32, len(c1))
+	assert.Equal(t, 32, len(c2))
 }
