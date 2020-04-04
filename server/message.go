@@ -27,14 +27,26 @@ func (m *Message) GetInt(name string) int {
 	return ret
 }
 
-func MessageEnc(msg *Message) []byte {
+func rawMessageEnc(msg *Message) []byte {
 	buf, err := json.Marshal(msg)
 	util.Check(err)
 	return buf
 }
 
-func MessageDec(buf []byte) *Message {
+func rawMessageDec(buf []byte) *Message {
 	ret := &Message{}
 	util.Check(json.Unmarshal(buf, ret))
 	return ret
+}
+
+func MessageEnc(msg *Message) []byte {
+	raw := rawMessageEnc(msg)
+	cryptor := &util.Cryptor{Secret:[]byte("12345678901234561234567890123456")}
+	return cryptor.Encrypt(raw)
+}
+
+func MessageDec(buf []byte) *Message {
+	cryptor := &util.Cryptor{Secret:[]byte("12345678901234561234567890123456")}
+	raw := cryptor.Decrypt(buf)
+	return rawMessageDec(raw)
 }
