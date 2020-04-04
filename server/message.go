@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"log"
+	"strconv"
 	"github.com/murer/lhproxy/util"
 )
 
@@ -17,6 +18,12 @@ func (m *Message) Get(name string) string {
 	if ret == "" {
 		log.Panicf("Message header is required: %s", name)
 	}
+	return ret
+}
+
+func (m *Message) GetInt(name string) int {
+	ret, err := strconv.Atoi(m.Get(name))
+	util.Check(err)
 	return ret
 }
 

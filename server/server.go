@@ -71,7 +71,7 @@ func HandleMessageListen(req *Message) *Message {
 }
 
 func HandleMessageAccept(req *Message) *Message {
-	scks.Accept(req)
+	sckid := scks.Accept(req.Get("sckid"))
 	return &Message{
 		Name: "resp/ok",
 		Headers: map[string]string{"sckid": sckid},
@@ -79,7 +79,7 @@ func HandleMessageAccept(req *Message) *Message {
 }
 
 func HandleMessageConnect(req *Message) *Message {
-	scks.Connect(req)
+	sckid := scks.Connect(req.Get("addr"))
 	return &Message{
 		Name: "resp/ok",
 		Headers: map[string]string{"sckid": sckid},
@@ -87,25 +87,16 @@ func HandleMessageConnect(req *Message) *Message {
 }
 
 func HandleMessageWrite(req *Message) *Message {
-	scks.Write(req)
-	return &Message{
-		Name: "resp/ok",
-		Headers: map[string]string{"sckid": sckid},
-	}
+	scks.Write(req.Get("sckid"), req.Payload, req.GetInt("resources"))
+	return &Message{Name: "resp/ok"}
 }
 
 func HandleMessageRead(req *Message) *Message {
-	scks.Read(req)
-	return &Message{
-		Name: "resp/ok",
-		Headers: map[string]string{"sckid": sckid},
-	}
+	payload := scks.Read(req.Get("sckid"), req.GetInt("max"))
+	return &Message{Name: "resp/ok",Payload: payload}
 }
 
 func HandleMessageClose(req *Message) *Message {
-	scks.Close(req)
-	return &Message{
-		Name: "resp/ok",
-		Headers: map[string]string{"sckid": sckid},
-	}
+	scks.Close(req.Get("sckid"), req.GetInt("crsrc"))
+	return &Message{Name: "resp/ok"}
 }

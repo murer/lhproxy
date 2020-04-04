@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"log"
 	"io/ioutil"
+	"strconv"
 	"github.com/murer/lhproxy/util"
 )
 
@@ -35,7 +36,7 @@ func (scks *HttpSockets) Listen(addr string) string {
 
 func (scks *HttpSockets) Accept(sckid string) string {
 	resp := scks.Send(&Message{
-			Name: "scks/accepet",
+			Name: "scks/accept",
 			Headers: map[string]string{"sckid": sckid},
 	})
 	return resp.Headers["sckid"]
@@ -52,14 +53,14 @@ func (scks *HttpSockets) Connect(addr string) string {
 func (scks *HttpSockets) Close(sckid string, resources int) {
 	scks.Send(&Message{
 			Name: "scks/close",
-			Headers: map[string]string{"sckid": sckid, "crsrc": string(resources)},
+			Headers: map[string]string{"sckid": sckid, "crsrc": strconv.Itoa(resources)},
 	})
 }
 
 func (scks *HttpSockets) Read(sckid string, max int) []byte {
 	resp := scks.Send(&Message{
 			Name: "scks/read",
-			Headers: map[string]string{"sckid": sckid,"max":string(max)},
+			Headers: map[string]string{"sckid": sckid,"max":strconv.Itoa(max)},
 	})
 	return resp.Payload
 }
@@ -67,7 +68,7 @@ func (scks *HttpSockets) Read(sckid string, max int) []byte {
 func (scks *HttpSockets) Write(sckid string, data []byte, resources int) {
 	scks.Send(&Message{
 			Name: "scks/write",
-			Headers: map[string]string{"sckid": sckid, "crsrc": string(resources)},
+			Headers: map[string]string{"sckid": sckid, "crsrc": strconv.Itoa(resources)},
 			Payload: data,
 	})
 }
