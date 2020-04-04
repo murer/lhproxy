@@ -116,7 +116,7 @@ func (scks *NativeSockets) Connect(addr string) string {
 	return c.id
 }
 
-func (scks *NativeSockets) Close(id string) {
+func (scks *NativeSockets) Close(id string, resources int) {
 	l := lns[id]
 	if l != nil {
 		log.Printf("[%s] Closing listen", l.id)
@@ -150,7 +150,7 @@ func (scks *NativeSockets) Read(id string, max int) []byte {
 	return buf
 }
 
-func (scks *NativeSockets) Write(id string, data []byte) {
+func (scks *NativeSockets) Write(id string, data []byte, closeOut bool) {
 	c := conns[id]
 	c.lastUsed = time.Now().Unix()
 	log.Printf("[]%s] Write: %d", c.id, len(data))
