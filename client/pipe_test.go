@@ -4,8 +4,9 @@ import (
 	"testing"
 	"time"
 	"io"
-	// "github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/assert"
 	"github.com/murer/lhproxy/sockets"
+	"github.com/murer/lhproxy/util"
 )
 
 func TestPipe(t *testing.T) {
@@ -29,5 +30,6 @@ func TestPipe(t *testing.T) {
 		Writer: rw,
 	}
 	go p.Execute()
-	lw.Write([]byte{1,2}}
+	lw.Write([]byte{1,2})
+	assert.Equal(t, []byte{1,2}, util.ReadFully(rr, 2))
 }

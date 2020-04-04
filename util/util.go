@@ -2,6 +2,7 @@ package util
 
 import (
 	"io"
+	"log"
 	"io/ioutil"
 )
 
@@ -21,4 +22,14 @@ func ReadAll(r io.Reader) []byte {
 
 func ReadAllString(r io.Reader) string {
 	return string(ReadAll(r))
+}
+
+func ReadFully(r io.Reader, n int) []byte {
+	buf := make([]byte, n)
+	nr, err := io.ReadAtLeast(r, buf, n)
+	Check(err)
+	if nr != n {
+		log.Panicf("wrong %d, expected %d", nr ,n)
+	}
+	return buf
 }

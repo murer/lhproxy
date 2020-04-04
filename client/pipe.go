@@ -3,6 +3,7 @@ package client
 import (
 	"io"
 	"github.com/murer/lhproxy/sockets"
+	"github.com/murer/lhproxy/util"
 )
 
 type Pipe struct {
@@ -13,6 +14,8 @@ type Pipe struct {
 }
 
 func (c Pipe) Execute() {
+	_, err := io.Copy(c.Writer, c.Reader)
+	util.Check(err)
 	// buf := make([]byte, 8 * 1024)
 	// for true {
 	// 	n, err := c.LReader.Read(buf)
