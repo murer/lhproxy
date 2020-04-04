@@ -63,7 +63,7 @@ func (l *listenerWrapper) accept() *connWrapper {
 }
 
 func (l *listenerWrapper) startAccepts() {
-	log.Printf("Starting accepts")
+	log.Printf("[%s] Starting accepts", l.id)
 	for true {
 		conn, err := l.ln.Accept()
 		if err != nil {
@@ -77,7 +77,7 @@ func (l *listenerWrapper) startAccepts() {
 			conn: conn,
 			lastUsed: time.Now().Unix(),
 		}
-		log.Printf("Caching accepted conn: %s", c.id)
+		log.Printf("[%s] Caching accepted conn", c.id)
 		l.queue.Put(c)
 	}
 }
@@ -98,21 +98,21 @@ func (scks *NativeSockets) Listen(addr string) string {
 	}
 	go l.startAccepts()
 	lns[l.id] = l
-	log.Printf("Listen %s", l.id)
+	log.Printf("[%s] Listening", l.id)
 	return l.id
 }
 
 func (scks *NativeSockets) Accept(name string) string {
 	l := lns[name]
 	l.lastUsed = time.Now().Unix()
-	log.Printf("Accepting %s", l.id)
+	log.Printf("[%s] Accepting", l.id)
 	conn := l.accept()
 	if conn == nil {
-		log.Printf("No connection accepted: %s", l.id)
+		log.Printf("[%s] No connection accepted", l.id)
 		return ""
 	}
 	conns[conn.id] = conn
-	log.Printf("Accepted %s", conn.id)
+	log.Printf("[%s] Accepted", conn.id)
 	return conn.id
 }
 
@@ -125,20 +125,20 @@ func (scks *NativeSockets) Connect(addr string) string {
 		lastUsed: time.Now().Unix(),
 	}
 	conns[c.id] = c
-	log.Printf("Connected: %s", c.id)
+	log.Printf("[%s] Connected", c.id)
 	return c.id
 }
 
 func (scks *NativeSockets) Close(id string) {
 	l := lns[id]
 	if l != nil {
-		log.Printf("Closing listen %s", l.id)
+		log.Printf("[%s] Closing listen", l.id)
 		delete(lns, l.id)
 		l.Close()
 	}
 	c := conns[id]
 	if c != nil {
-		log.Printf("Closing connection %s", c.id)
+		log.Printf("[%s] Closing connection", c.id)
 		delete(conns, c.id)
 		c.Close()
 	}
@@ -159,18 +159,18 @@ func (scks *NativeSockets) Read(id string, max int) []byte {
 	}
 	buf = buf[:n]
 	c.lastUsed = time.Now().Unix()
-	log.Printf("Read %s: %d", c.id, len(buf))
+	log.Printf("[%s] Read: %d", c.id, len(buf))
 	return buf
 }
 
 func (scks *NativeSockets) Write(id string, data []byte) {
 	c := conns[id]
 	c.lastUsed = time.Now().Unix()
-	log.Printf("Write %s: %d", c.id, len(data))
+	log.Printf("[]%s] Write: %d", c.id, len(data))
 	n, err := c.conn.Write(data)
 	util.Check(err)
 	if n != len(data) {
-		log.Panicf("Wrong: %d, should was: %d", n, len(data))
+		log.Panicf("[%s] Wrong: %d, should was: %d", c.id, n, len(data))
 	}
 }
 
