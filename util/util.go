@@ -48,6 +48,5 @@ func Secret() []byte {
 	if ret == "" {
 		log.Panicf("LHPROXY_SECRET not found")
 	}
-	log.Printf("SECRET: %x", ret)
 	return []byte(ret)
 }
