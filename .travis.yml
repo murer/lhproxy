@@ -16,4 +16,5 @@ deploy:
   provider: releases
   name: test
   overwrite: true
+  draft: true
   edge: true
