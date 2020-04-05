@@ -23,10 +23,10 @@ cmd_build() {
   lhproxy_version="${3:-"dev"}"
   lhproxy_excname="lhproxy"
   if [[ "x$lhproxy_goos" == "xwindows" ]]; then lhproxy_excname="lhproxy.exe"; fi
-  lhproxy_ldflags="-s -w -extldflags '-static'"
+  lhproxy_ldflags="-s -w -extldflags '-static' -X main.Version=$lhproxy_version"
   rm -rvf "build/out/$lhproxy_goos-$lhproxy_goarch" || true
   CGO_ENABLED="0" GOOS="$lhproxy_goos" GOARCH="$lhproxy_goarch" \
-    go build -a -trimpath -ldflags "$ldflags" \
+    go build -a -trimpath -ldflags "$lhproxy_ldflags" \
       -installsuffix cgo -tags netgo -mod mod \
       -o "build/out/$lhproxy_goos-$lhproxy_goarch/lhproxy-$lhproxy_version/$lhproxy_excname" .
 }
