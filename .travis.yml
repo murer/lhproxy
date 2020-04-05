@@ -14,18 +14,18 @@ script:
   - export GITHUB_TAG_NAME="$LHPROXY_VERSION"
 
 deploy:
-  provider: releases
-  overwrite: true
-  draft: true
-  file: build/pack/*
-  edge: true
-  on:
-    tags: true
-    condition: $TRAVIS_TAG =~ ^lhproxy-.*$
+  - provider: releases
+    overwrite: true
+    draft: true
+    file: build/pack/*
+    edge: true
+    on:
+      tags: true
+      condition: $TRAVIS_TAG =~ ^lhproxy-.*$
 
-  provider: script
-  script: ./ci/ci.sh deploy_docker
-  edge: true
-  on:
-    tags: true
-    condition: $TRAVIS_TAG =~ ^lhproxy-.*$
+  - provider: script
+    script: ./ci/ci.sh deploy_docker
+    edge: true
+    on:
+      tags: true
+      condition: $TRAVIS_TAG =~ ^lhproxy-.*$
