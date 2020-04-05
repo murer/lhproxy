@@ -15,7 +15,8 @@ cmd_tty() {
 }
 
 cmd_test() {
-  LHPROXY_DOCKER_EXTRA=-i cmd_run go test ./pipe ./server ./util ./util/queue ./test ./cmd "$@"
+  LHPROXY_DOCKER_EXTRA=-i cmd_run go test \
+    ./pipe ./server ./util ./util/queue ./test ./cmd "$@"
 }
 
 cmd_curl_test() {
