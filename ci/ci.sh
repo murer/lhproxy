@@ -1,12 +1,12 @@
 #!/bin/bash -xe
 
 cmd_detect_version() {
-  mkdir build
-  LHPROXY_VERSION="$TRAVIS_TAG"
+  export LHPROXY_VERSION="$TRAVIS_TAG"
   if [[ -z "$LHPROXY_VERSION" ]]; then
-    LHPROXY_VERSION="branch-$TRAVIS_BRANCH"
+    export LHPROXY_VERSION="branch-$TRAVIS_BRANCH"
   fi
-  echo "$LHPROXY_VERSION" > build/version.txt
+  export LHPROXY_VERSION
+  export GITHUB_TAG_NAME="$LHPROXY_VERSION"
 }
 
 cmd_build() {
