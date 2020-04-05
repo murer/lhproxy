@@ -26,7 +26,9 @@ cmd_deploy_docker() {
   set +x
   docker login --username "$DOCKERHUB_USER" --password "$DOCKERHUB_PASS"
   set -x
-  ./docker.sh push
+  LHPROXY_DOCKER_VERSION="$(echo "$LHPROXY_VERSION" | cut -d'-' -f2-)"
+  ./docker.sh push "$LHPROXY_DOCKER_VERSION"
+  ./docker.sh push latest
 }
 
 cd "$(dirname "$0")/.."; _cmd="${1?"cmd is required"}"; shift; "cmd_${_cmd}" "$@"
