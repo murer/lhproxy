@@ -11,8 +11,9 @@ func TestMessage(t *testing.T) {
 				Headers: map[string]string{"foo": "1", "bar": "2"},
 				Payload: []byte{1,2},
 		}
-		buf := MessageEnc(original)
-		msg := MessageDec(buf)
+		secret := []byte("12345678901234561234567890123456")
+		buf := MessageEnc(secret, original)
+		msg := MessageDec(secret, buf)
 		assert.Equal(t, original, msg)
 		assert.Equal(t, 48, len(buf))
 }

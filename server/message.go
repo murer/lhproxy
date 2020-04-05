@@ -58,14 +58,14 @@ func rawMessageDec(buf []byte) *Message {
 	return ret
 }
 
-func MessageEnc(msg *Message) []byte {
+func MessageEnc(secret []byte, msg *Message) []byte {
 	raw := rawMessageEnc(msg)
-	cryptor := &util.Cryptor{Secret:[]byte("12345678901234561234567890123456")}
+	cryptor := &util.Cryptor{Secret:secret}
 	return cryptor.Encrypt(raw)
 }
 
-func MessageDec(buf []byte) *Message {
-	cryptor := &util.Cryptor{Secret:[]byte("12345678901234561234567890123456")}
+func MessageDec(secret []byte, buf []byte) *Message {
+	cryptor := &util.Cryptor{Secret:secret}
 	raw := cryptor.Decrypt(buf)
 	return rawMessageDec(raw)
 }

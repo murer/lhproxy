@@ -9,13 +9,15 @@ import (
 )
 
 var scks sockets.Sockets
+var secret []byte
 
-func SetSockets(x sockets.Sockets) {
+func Config(x sockets.Sockets, y []byte) {
 	scks = x
+	secret = y
 }
 
-func Start(addr string) {
-	SetSockets(sockets.GetNative())
+func Start(addr string, sec []byte) {
+	Config(sockets.GetNative(), secret)
 	http.HandleFunc("/", Handle)
 	log.Printf("Starting server")
 	err := http.ListenAndServe(addr, nil)
@@ -36,9 +38,9 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 func HandleSockets(w http.ResponseWriter, r *http.Request) {
 	breq, err := ioutil.ReadAll(r.Body)
 	util.Check(err)
-	mreq := MessageDec(breq)
+	mreq := MessageDec(secret, breq)
 	mresp := HandleMessage(mreq)
-	bresp := MessageEnc(mresp)
+	bresp := MessageEnc(secret, mresp)
 	w.Header().Set("Content-Type", "application/octet-stream")
 	w.Write(bresp)
 }

@@ -11,10 +11,11 @@ import (
 
 type HttpSockets struct {
 	URL string
+	Secret []byte
 }
 
 func (scks *HttpSockets) Send(mreq *Message) *Message {
-	breq := MessageEnc(mreq)
+	breq := MessageEnc(scks.Secret, mreq)
 	resp, err := http.Post(scks.URL, "application/octet-stream", bytes.NewBuffer(breq))
 	util.Check(err)
 	if resp.StatusCode != 200 {
@@ -22,7 +23,7 @@ func (scks *HttpSockets) Send(mreq *Message) *Message {
 	}
 	bresp, err := ioutil.ReadAll(resp.Body)
 	util.Check(err)
-	mresp := MessageDec(bresp)
+	mresp := MessageDec(scks.Secret, bresp)
 	return mresp
 }
 
