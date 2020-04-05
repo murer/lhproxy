@@ -14,6 +14,12 @@ docker_golang() {
     golang:1.14 "$@"
 }
 
+cmd_clean() {
+  ./build.sh clean
+  docker ps -aq --filter label lhproxy_dev | xargs docker rm -f || true
+  docker system prune --volumes --filter label=lhproxy_dev -f || true
+}
+
 cmd_run() {
   dockername="${1?'docker name'}"
   shift

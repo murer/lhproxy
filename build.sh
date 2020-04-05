@@ -7,6 +7,10 @@ find_dirs_by_file() {
   set -x
 }
 
+cmd_clean() {
+  rm -rf build || true
+}
+
 cmd_test() {
   findbase="${1?"path is required, may be ."}"
   shift
