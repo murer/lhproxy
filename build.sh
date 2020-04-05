@@ -5,6 +5,15 @@ cmd_test() {
 }
 
 cmd_fmt() {
+  # set +x
+  find -name "*.go" | grep -v "\.git" | \
+    while read k; do dirname "$k"; done | sort | uniq | \
+    while read k; do go fmt -x "$k" ; done
+  # set -x
+}
+
+
+cmd_fmt2() {
   set +x
   docker rm -f lhproxy_golang_fmt || true
   find -name "*.go" | grep -v "\.git" | \

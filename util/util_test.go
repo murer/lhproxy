@@ -1,13 +1,13 @@
 package util
 
 import (
+	"errors"
 	"testing"
-  "errors"
 
-  "github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCheck(t *testing.T) {
-  Check(nil)
-  assert.Panics(t, func() { Check(errors.New("mock error")) })
+	Check(nil)
+	assert.Panics(t, func() { Check(errors.New("mock error")) })
 }

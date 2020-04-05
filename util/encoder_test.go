@@ -2,12 +2,12 @@ package util
 
 import (
 	"bytes"
-	"testing"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 type Data struct {
-	Code uint8
+	Code    uint8
 	Payload [2]byte
 }
 
@@ -28,8 +28,8 @@ func TestBinWrite(t *testing.T) {
 }
 
 func TestBinStruct(t *testing.T) {
-	data := &Data{7, [2]byte{1,2}}
-	assert.Equal(t, []byte{7,1,2}, BinEnc(data))
-	BinDec([]byte{8,2,3}, data)
-	assert.Equal(t, &Data{8, [2]byte{2,3}}, data)
+	data := &Data{7, [2]byte{1, 2}}
+	assert.Equal(t, []byte{7, 1, 2}, BinEnc(data))
+	BinDec([]byte{8, 2, 3}, data)
+	assert.Equal(t, &Data{8, [2]byte{2, 3}}, data)
 }

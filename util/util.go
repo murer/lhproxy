@@ -2,9 +2,9 @@ package util
 
 import (
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
-	"io/ioutil"
 )
 
 var Version = "dev"
@@ -30,7 +30,7 @@ func ReadFully(r io.Reader, n int) []byte {
 	nr, err := io.ReadAtLeast(r, buf, n)
 	Check(err)
 	if nr != n {
-		log.Panicf("wrong %d, expected %d", nr ,n)
+		log.Panicf("wrong %d, expected %d", nr, n)
 	}
 	return buf
 }
@@ -39,7 +39,7 @@ func WriteFully(w io.Writer, buf []byte) {
 	nr, err := w.Write(buf)
 	Check(err)
 	if nr != len(buf) {
-		log.Panicf("wrong %d, expected %d", nr ,len(buf))
+		log.Panicf("wrong %d, expected %d", nr, len(buf))
 	}
 }
 

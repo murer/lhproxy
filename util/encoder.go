@@ -1,9 +1,9 @@
 package util
 
 import (
-	"io"
 	"bytes"
 	"encoding/binary"
+	"io"
 )
 
 func BinEnc(data interface{}) []byte {

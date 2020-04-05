@@ -2,13 +2,13 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/spf13/cobra"
 	"os"
 	"runtime"
-	"github.com/spf13/cobra"
 
 	"github.com/murer/lhproxy/pipe"
-	"github.com/murer/lhproxy/sockets"
 	"github.com/murer/lhproxy/server"
+	"github.com/murer/lhproxy/sockets"
 
 	"github.com/murer/lhproxy/util"
 )
@@ -33,10 +33,10 @@ func Config() {
 
 	configServer()
 
-	clientCmd = &cobra.Command{Use:"client"}
+	clientCmd = &cobra.Command{Use: "client"}
 	rootCmd.AddCommand(clientCmd)
 
-	pipeCmd = &cobra.Command{Use:"pipe"}
+	pipeCmd = &cobra.Command{Use: "pipe"}
 	clientCmd.AddCommand(pipeCmd)
 
 	configPipe()
@@ -44,7 +44,7 @@ func Config() {
 
 func configServer() {
 	rootCmd.AddCommand(&cobra.Command{
-		Use: "server <host>:<port>",
+		Use:  "server <host>:<port>",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			server.Start(args[0], util.Secret())
@@ -55,14 +55,14 @@ func configServer() {
 
 func configPipe() {
 	pipeCmd.AddCommand(&cobra.Command{
-		Use: "native <host>:<port>",
+		Use:  "native <host>:<port>",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			p := &pipe.Pipe{
-				Scks: sockets.GetNative(),
+				Scks:    sockets.GetNative(),
 				Address: args[0],
-				Reader: os.Stdin,
-				Writer: os.Stdout,
+				Reader:  os.Stdin,
+				Writer:  os.Stdout,
 			}
 			p.Execute()
 			return nil
@@ -70,17 +70,17 @@ func configPipe() {
 	})
 
 	pipeCmd.AddCommand(&cobra.Command{
-		Use: "lhproxy <lhproxy:port> <host>:<port>",
+		Use:  "lhproxy <lhproxy:port> <host>:<port>",
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			p := &pipe.Pipe{
 				Scks: &server.HttpSockets{
-					URL:args[0],
+					URL:    args[0],
 					Secret: util.Secret(),
 				},
 				Address: args[1],
-				Reader: os.Stdin,
-				Writer: os.Stdout,
+				Reader:  os.Stdin,
+				Writer:  os.Stdout,
 			}
 			p.Execute()
 			return nil

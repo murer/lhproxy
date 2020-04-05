@@ -1,13 +1,13 @@
 package server
 
 import (
+	"github.com/murer/lhproxy/util"
 	"log"
 	"strconv"
-	"github.com/murer/lhproxy/util"
 )
 
 type Message struct {
-	Name string
+	Name    string
 	Headers map[string]string
 	Payload []byte
 }
@@ -44,7 +44,7 @@ func rawMessageEnc(msg *Message) []byte {
 }
 
 func rawMessageDec(buf []byte) *Message {
-	ret := &Message{Headers:map[string]string{}}
+	ret := &Message{Headers: map[string]string{}}
 	b := util.NewBinary(buf)
 	ret.Name = b.ReadString()
 	mapLen := int(b.ReadUInt16())
@@ -60,12 +60,12 @@ func rawMessageDec(buf []byte) *Message {
 
 func MessageEnc(secret []byte, msg *Message) []byte {
 	raw := rawMessageEnc(msg)
-	cryptor := &util.Cryptor{Secret:secret}
+	cryptor := &util.Cryptor{Secret: secret}
 	return cryptor.Encrypt(raw)
 }
 
 func MessageDec(secret []byte, buf []byte) *Message {
-	cryptor := &util.Cryptor{Secret:secret}
+	cryptor := &util.Cryptor{Secret: secret}
 	raw := cryptor.Decrypt(buf)
 	return rawMessageDec(raw)
 }

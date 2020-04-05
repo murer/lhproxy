@@ -1,11 +1,11 @@
 package server
 
 import (
-	"log"
-	"net/http"
-	"io/ioutil"
 	"github.com/murer/lhproxy/sockets"
 	"github.com/murer/lhproxy/util"
+	"io/ioutil"
+	"log"
+	"net/http"
 )
 
 var scks sockets.Sockets
@@ -67,7 +67,7 @@ func HandleMessage(req *Message) *Message {
 func HandleMessageListen(req *Message) *Message {
 	sckid := scks.Listen(req.Get("addr"))
 	return &Message{
-		Name: "resp/ok",
+		Name:    "resp/ok",
 		Headers: map[string]string{"sckid": sckid},
 	}
 }
@@ -75,7 +75,7 @@ func HandleMessageListen(req *Message) *Message {
 func HandleMessageAccept(req *Message) *Message {
 	sckid := scks.Accept(req.Get("sckid"))
 	return &Message{
-		Name: "resp/ok",
+		Name:    "resp/ok",
 		Headers: map[string]string{"sckid": sckid},
 	}
 }
@@ -83,7 +83,7 @@ func HandleMessageAccept(req *Message) *Message {
 func HandleMessageConnect(req *Message) *Message {
 	sckid := scks.Connect(req.Get("addr"))
 	return &Message{
-		Name: "resp/ok",
+		Name:    "resp/ok",
 		Headers: map[string]string{"sckid": sckid},
 	}
 }
@@ -95,7 +95,7 @@ func HandleMessageWrite(req *Message) *Message {
 
 func HandleMessageRead(req *Message) *Message {
 	payload := scks.Read(req.Get("sckid"), req.GetInt("max"))
-	return &Message{Name: "resp/ok",Payload: payload}
+	return &Message{Name: "resp/ok", Payload: payload}
 }
 
 func HandleMessageClose(req *Message) *Message {

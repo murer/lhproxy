@@ -1,9 +1,9 @@
 package queue
 
 import (
-	"time"
-	"testing"
 	"github.com/stretchr/testify/assert"
+	"testing"
+	"time"
 )
 
 func TestQueueInt(t *testing.T) {

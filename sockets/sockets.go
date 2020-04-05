@@ -9,7 +9,6 @@ const CLOSE_SCK = 1
 const CLOSE_IN = 2
 const CLOSE_OUT = 4
 
-
 type Sockets interface {
 	Listen(addr string) string
 	Accept(name string) string
@@ -18,8 +17,6 @@ type Sockets interface {
 	Write(id string, data []byte, close int)
 	Close(id string, resources int)
 }
-
-
 
 func ReplyServer(scks Sockets, listenId string) {
 	log.Printf("[%s] Starting ReplyServer", listenId)
@@ -32,10 +29,10 @@ func ReplyServer(scks Sockets, listenId string) {
 			go func() {
 				defer scks.Close(sckid, CLOSE_SCK)
 				for true {
-					data := scks.Read(sckid, 16 * 1204)
+					data := scks.Read(sckid, 16*1204)
 					if data == nil {
-						 scks.Close(sckid, CLOSE_OUT)
-						 break
+						scks.Close(sckid, CLOSE_OUT)
+						break
 					}
 					scks.Write(sckid, data, CLOSE_NONE)
 				}

@@ -2,10 +2,10 @@ package util
 
 import (
 	"bytes"
-	"log"
-	"crypto/rand"
 	"crypto/aes"
 	"crypto/cipher"
+	"crypto/rand"
+	"log"
 )
 
 const CRYPTOR_KEY_SIZE = 32
@@ -70,7 +70,7 @@ func (c *Cryptor) Decrypt(ciphertext []byte) []byte {
 	decrypter := cipher.NewCBCDecrypter(block, iv)
 	decrypter.CryptBlocks(ciphertext, ciphertext)
 	trimmed := pkcs5trim(ciphertext, decrypter.BlockSize())
-	if ! bytes.Equal(trimmed[:CRYPTOR_BLOCK_SIZE], salt) {
+	if !bytes.Equal(trimmed[:CRYPTOR_BLOCK_SIZE], salt) {
 		log.Panicf("It is wrong salted")
 	}
 	trimmed = trimmed[CRYPTOR_BLOCK_SIZE:]

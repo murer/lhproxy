@@ -2,8 +2,8 @@ package util
 
 import (
 	"bytes"
-	"log"
 	"encoding/binary"
+	"log"
 )
 
 func NewBinary(data []byte) *Binary {

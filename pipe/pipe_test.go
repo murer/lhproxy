@@ -1,17 +1,17 @@
 package pipe
 
 import (
-	"testing"
-	"time"
-	"io"
-	"github.com/stretchr/testify/assert"
 	"github.com/murer/lhproxy/sockets"
 	"github.com/murer/lhproxy/util"
+	"github.com/stretchr/testify/assert"
+	"io"
+	"testing"
+	"time"
 )
 
 func TestPipe(t *testing.T) {
 	scks := &sockets.NativeSockets{
-		ReadTimeout: 3000 * time.Millisecond,
+		ReadTimeout:   3000 * time.Millisecond,
 		AcceptTimeout: 3000 * time.Millisecond,
 	}
 	lr, lw := io.Pipe()
@@ -26,15 +26,15 @@ func TestPipe(t *testing.T) {
 	go sockets.ReplyServer(scks, sckid)
 
 	p := &Pipe{
-		Scks: scks,
+		Scks:    scks,
 		Address: "localhost:5001",
-		Reader: lr,
-		Writer: rw,
+		Reader:  lr,
+		Writer:  rw,
 	}
 	go p.Execute()
-	lw.Write([]byte{1,2})
-	assert.Equal(t, []byte{1,2}, util.ReadFully(rr, 2))
-	lw.Write([]byte{3,4})
+	lw.Write([]byte{1, 2})
+	assert.Equal(t, []byte{1, 2}, util.ReadFully(rr, 2))
+	lw.Write([]byte{3, 4})
 	lw.Close()
-	assert.Equal(t, []byte{3,4}, util.ReadAll(rr))
+	assert.Equal(t, []byte{3, 4}, util.ReadAll(rr))
 }

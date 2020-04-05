@@ -1,9 +1,9 @@
 package server
 
 import (
-	"testing"
 	"net/http"
 	"net/http/httptest"
+	"testing"
 
 	"github.com/stretchr/testify/assert"
 

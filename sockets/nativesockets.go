@@ -1,12 +1,12 @@
 package sockets
 
 import (
+	"fmt"
+	"io"
 	"log"
 	"net"
-	"fmt"
-	"time"
-	"io"
 	"strings"
+	"time"
 
 	"github.com/murer/lhproxy/util"
 )
@@ -35,8 +35,8 @@ func DescError(err error) int {
 }
 
 type connWrapper struct {
-	id string
-	conn *net.TCPConn
+	id       string
+	conn     *net.TCPConn
 	lastUsed int64
 }
 
@@ -45,8 +45,8 @@ func (c *connWrapper) Close() {
 }
 
 type listenerWrapper struct {
-	id string
-	ln net.Listener
+	id       string
+	ln       net.Listener
 	lastUsed int64
 }
 
@@ -66,8 +66,8 @@ func (l *listenerWrapper) accept(timeout time.Duration) (*connWrapper, bool) {
 	}
 	util.Check(err)
 	c := &connWrapper{
-		id: fmt.Sprintf("conn://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String()),
-		conn: conn.(*net.TCPConn),
+		id:       fmt.Sprintf("conn://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String()),
+		conn:     conn.(*net.TCPConn),
 		lastUsed: time.Now().Unix(),
 	}
 	return c, false
@@ -75,12 +75,14 @@ func (l *listenerWrapper) accept(timeout time.Duration) (*connWrapper, bool) {
 
 var lns = make(map[string]*listenerWrapper)
 var conns = make(map[string]*connWrapper)
+
 type NativeSockets struct {
-	ReadTimeout time.Duration
+	ReadTimeout   time.Duration
 	AcceptTimeout time.Duration
 }
+
 var native = &NativeSockets{
-	ReadTimeout: 30 * time.Second,
+	ReadTimeout:   30 * time.Second,
 	AcceptTimeout: 30 * time.Second,
 }
 
@@ -88,8 +90,8 @@ func (scks *NativeSockets) Listen(addr string) string {
 	ln, err := net.Listen("tcp", addr)
 	util.Check(err)
 	l := &listenerWrapper{
-		ln: ln,
-		id: fmt.Sprintf("listen://%s", ln.Addr().String()),
+		ln:       ln,
+		id:       fmt.Sprintf("listen://%s", ln.Addr().String()),
 		lastUsed: time.Now().Unix(),
 	}
 	lns[l.id] = l
@@ -119,8 +121,8 @@ func (scks *NativeSockets) Connect(addr string) string {
 	conn, err := net.Dial("tcp", addr)
 	util.Check(err)
 	c := &connWrapper{
-		id: fmt.Sprintf("conn://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String()),
-		conn: conn.(*net.TCPConn),
+		id:       fmt.Sprintf("conn://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String()),
+		conn:     conn.(*net.TCPConn),
 		lastUsed: time.Now().Unix(),
 	}
 	conns[c.id] = c
