@@ -4,6 +4,8 @@
 
 For **Linux**, **Windows** and **Mac**
 
+[![LHProxy](https://travis-ci.org/murer/lhproxy.svg)](https://circleci.com/gh/murer/lhproxy)
+
 ### Download
 
 Download from <a href="https://github.com/murer/lhproxy/releases">Github Releases</a>.
