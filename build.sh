@@ -17,6 +17,17 @@ cmd_fmt() {
   find_dirs_by_file "." '*.go' | while read k; do go fmt -x "$k" ; done
 }
 
+cmd_build() {
+  lhproxy_goos="${1?'use: linux, darwin or windows'}"
+  lhproxy_goarch="${2:-"amd64"}"
+  lhproxy_version="${3:-"dev"}"
+  lhproxy_ldflags="-s -w -extldflags '-static'"
+  CGO_ENABLED="0" GOOS="$lhproxy_goos" GOARCH="$lhproxy_goarch" \
+    go build -a -trimpath -ldflags "$ldflags" \
+      -installsuffix cgo -tags netgo -mod mod \
+      -o "build/out/$lhproxy_goos-$lhproxy_goarch/dsa/$lhproxy_version" .
+}
+
 cmd_sshtest() {
   ssh localhost whoami
   ssh -o "ProxyCommand ./build.sh runi go run main.go client pipe native %h:%p" localhost whoami
