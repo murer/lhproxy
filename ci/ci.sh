@@ -1,9 +1,8 @@
 #!/bin/bash -xe
 
-cmd_test() {
+cmd_build() {
   ./docker.sh runi golang ./build.sh test .
-  [[ -z "$(git status --porcelain)" ]]
-  ./docker.sh runi golang ./build.sh fmt
+  ./docker.sh runi golang ./build.sh build_all dev
   [[ -z "$(git status --porcelain)" ]]
 }
 
