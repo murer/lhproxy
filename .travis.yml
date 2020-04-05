@@ -11,6 +11,7 @@ script:
   - ./ci/ci.sh build
   - ./ci/ci.sh fmt
   - export GITHUB_NAME="$LHPROXY_VERSION"
+  - export GITHUB_TAG_NAME="$LHPROXY_VERSION"
 
 deploy:
   provider: releases
