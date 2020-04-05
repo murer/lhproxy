@@ -5,6 +5,8 @@ import (
 	"github.com/spf13/cobra"
 	"os"
 	"runtime"
+	"log"
+	"io/ioutil"
 
 	"github.com/murer/lhproxy/pipe"
 	"github.com/murer/lhproxy/server"
@@ -22,6 +24,8 @@ func Config() {
 		Use: "lhproxy", Short: "Last Hope Proxy",
 		Version: fmt.Sprintf("%s-%s:%s", runtime.GOOS, runtime.GOARCH, util.Version),
 	}
+	rootCmd.PersistentFlags().BoolP("quiet", "q", false, "Quiet")
+	cobra.OnInitialize(gconf)
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "version",
@@ -40,6 +44,14 @@ func Config() {
 	clientCmd.AddCommand(pipeCmd)
 
 	configPipe()
+}
+
+func gconf() {
+	quiet, err := rootCmd.PersistentFlags().GetBool("quiet")
+	util.Check(err)
+	if quiet {
+		log.SetOutput(ioutil.Discard)
+	}
 }
 
 func configServer() {
