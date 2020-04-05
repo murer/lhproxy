@@ -8,6 +8,7 @@ before_install:
 
 script:
   - export LHPROXY_VERSION="$(cat build/version.txt)"
+  - export GITHUB_TAG_NAME="$(cat build/version.txt)"
   - ./ci/ci.sh build
   # - ./ci/ci.sh fmt
 
