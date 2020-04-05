@@ -11,11 +11,10 @@ cmd_test() {
   findbase="${1?"path is required, may be ."}"
   shift
   find_dirs_by_file "$findbase" '*_test.go' | xargs go test "$@"
-  #go test ./pipe ./server ./util ./util/queue ./test ./cmd "$@"
 }
 
 cmd_fmt() {
-  find_dirs_by_file '*.go' | while read k; do go fmt -x "$k" ; done
+  find_dirs_by_file "." '*.go' | while read k; do go fmt -x "$k" ; done
 }
 
 cmd_sshtest() {
