@@ -3,6 +3,9 @@ language: minimal
 services:
   - docker
 
+before_install:
+  - env
+
 script:
   - ./ci/ci.sh build
   - ./ci/ci.sh fmt
