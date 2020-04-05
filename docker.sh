@@ -2,11 +2,6 @@
 
 LHPROXY_USER_ID="$(id -u):$(id -g)"
 
-docker_hub() {
-  docker run $LHPROXY_DOCKER_EXTRA --rm --label lhproxy_dev \
-    lhproxy/hub:local "$@"
-}
-
 docker_golang() {
   docker volume create lhproxy_golang_dev --label lhproxy_dev || true
   docker run $LHPROXY_DOCKER_EXTRA --rm --label lhproxy_dev \
@@ -17,12 +12,6 @@ docker_golang() {
     -u "$LHPROXY_USER_ID" \
     -e "HOME=/go" \
     golang:1.14 "$@"
-}
-
-cmd_images() {
-  cd docker
-  docker build -t lhproxy/hub:local -f Dockerfile.hub .
-  cd -
 }
 
 cmd_clean() {
