@@ -1,30 +1,7 @@
 #!/bin/bash -xe
 
-cmd_run() {
-  docker volume create lhproxy_golang_dev --label lhproxy_dev || true
-  docker run $LHPROXY_DOCKER_EXTRA --rm --label lhproxy_dev \
-    --mount source=lhproxy_golang_dev,target=/go \
-    -v "$(pwd)":/go/src -w /go/src \
-    --network host \
-    -e "LHPROXY_SECRET=12345678901234561234567890123456" \
-    golang:1.14 "$@"
-}
-
-cmd_runi() {
-  LHPROXY_DOCKER_EXTRA=-i cmd_run "$@"
-}
-
-cmd_runit() {
-  LHPROXY_DOCKER_EXTRA=-it cmd_run "$@"
-}
-
-cmd_rund() {
-  LHPROXY_DOCKER_EXTRA=-d cmd_run "$@"
-}
-
 cmd_test() {
-  cmd_runi go test \
-    ./pipe ./server ./util ./util/queue ./test ./cmd "$@"
+  go test ./pipe ./server ./util ./util/queue ./test ./cmd "$@"
 }
 
 cmd_fmt() {

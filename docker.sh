@@ -1,5 +1,7 @@
 #!/bin/bash -xe
 
+LHPROXY_USER_ID="$(id -u):$(id -g)"
+
 docker_golang() {
   docker volume create lhproxy_golang_dev --label lhproxy_dev || true
   docker run $LHPROXY_DOCKER_EXTRA --rm --label lhproxy_dev \
@@ -7,7 +9,8 @@ docker_golang() {
     -v "$(pwd)":/go/src -w /go/src \
     --network host \
     -e "LHPROXY_SECRET=12345678901234561234567890123456" \
-    -u "$(id -u):$(id -g)" \
+    -u "$LHPROXY_USER_ID" \
+    -e "HOME=/go" \
     golang:1.14 "$@"
 }
 
