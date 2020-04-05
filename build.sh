@@ -20,12 +20,14 @@ cmd_test() {
 }
 
 cmd_fmt() {
+  set +x
   docker rm -f lhproxy_golang_fmt || true
   find -name "*.go" | grep -v "\.git" | \
     while read k; do dirname "$k"; done | sort | uniq | \
     while read k; do \
       LHPROXY_DOCKER_EXTRA=-i cmd_run go fmt -x
     done
+  set -x
 }
 
 cd "$(dirname "$0")"; _cmd="${1?"cmd is required"}"; shift; "cmd_${_cmd}" "$@"
