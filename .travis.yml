@@ -4,5 +4,5 @@ services:
   - docker
 
 script:
-  - ./ci/ci.sh test
+  - ./ci/ci.sh test .
   - ./ci/ci.sh fmt
