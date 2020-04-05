@@ -3,6 +3,7 @@ package util
 import (
 	"io"
 	"log"
+	"os"
 	"io/ioutil"
 )
 
@@ -40,4 +41,12 @@ func WriteFully(w io.Writer, buf []byte) {
 	if nr != len(buf) {
 		log.Panicf("wrong %d, expected %d", nr ,len(buf))
 	}
+}
+
+func Secret() string {
+	ret := os.Getenv("LHPROXY_SECRET")
+	if ret == "" {
+		log.Panicf("LHPROXY_SECRET not found")
+	}
+	return ret
 }

@@ -74,7 +74,10 @@ func configPipe() {
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			p := &pipe.Pipe{
-				Scks: &server.HttpSockets{URL:args[0]},
+				Scks: &server.HttpSockets{
+					URL:args[0],
+					Secret: util.Secret()
+				},
 				Address: args[1],
 				Reader: os.Stdin,
 				Writer: os.Stdout,
