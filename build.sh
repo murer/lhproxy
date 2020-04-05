@@ -6,6 +6,7 @@ cmd_golang() {
     --mount source=lhproxy_golang_dev,target=/go \
     -v "$(pwd)":/go/src -w /go/src \
     --network host \
+    -e "LHPROXY_SECRET=12345678901234561234567890123456" \
     golang:1.14 "$@"
 }
 

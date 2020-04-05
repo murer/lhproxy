@@ -17,7 +17,7 @@ func Config(x sockets.Sockets, y []byte) {
 }
 
 func Start(addr string, sec []byte) {
-	Config(sockets.GetNative(), secret)
+	Config(sockets.GetNative(), sec)
 	http.HandleFunc("/", Handle)
 	log.Printf("Starting server")
 	err := http.ListenAndServe(addr, nil)
