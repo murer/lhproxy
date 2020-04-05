@@ -5,11 +5,11 @@ cmd_test() {
 }
 
 cmd_fmt() {
-  # set +x
+  set +x
   find -name "*.go" | grep -v "\.git" | \
     while read k; do dirname "$k"; done | sort | uniq | \
     while read k; do go fmt -x "$k" ; done
-  # set -x
+  set -x
 }
 
 
