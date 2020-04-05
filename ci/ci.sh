@@ -10,8 +10,9 @@ cmd_detect_version() {
 }
 
 cmd_build() {
+  LHPROXY_VERSION="$(cat build/version.txt)"
   ./docker.sh runi golang ./build.sh test .
-  ./docker.sh runi golang ./build.sh build_all dev
+  ./docker.sh runi golang ./build.sh build_all "$LHPROXY_VERSION"
   [[ -z "$(git status --porcelain)" ]]
 }
 
