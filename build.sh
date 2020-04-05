@@ -19,15 +19,4 @@ cmd_test() {
     ./pipe ./server ./util ./util/queue ./test ./cmd "$@"
 }
 
-cmd_curl_test() {
-  curl -v \
-     --no-buffer \
-     --header "Connection: Upgrade" \
-     --header "Upgrade: websocket" \
-     --header "Sec-WebSocket-Key: SGVsbG8sIHdvcmxkIQ==" \
-     --header "Sec-WebSocket-Protocol: chisel-v3" \
-     --header "Sec-WebSocket-Version: 13" \
-     http://t1.test.serasa.a.vpn.dextra.com.br/
-}
-
 cd "$(dirname "$0")"; _cmd="${1?"cmd is required"}"; shift; "cmd_${_cmd}" "$@"
