@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/murer/lhproxy/cmd"
-	// . "github.com/murer/lhproxy/util"
+	"github.com/murer/lhproxy/util"
 )
 
 var Version = "dev"
