@@ -1,0 +1,9 @@
+FROM alpine:latest
+
+RUN apk add --update --no-cache bash openssh libc6-compat git
+
+WORKDIR /opt
+RUN wget -O hub.tgz \
+  'https://github.com/github/hub/releases/download/v2.14.2/hub-linux-amd64-2.14.2.tgz'
+RUN tar xzf hub.tgz
+RUN hub-linux-amd64-2.14.2/install

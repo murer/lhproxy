@@ -9,3 +9,9 @@ before_install:
 script:
   - ./ci/ci.sh build
   # - ./ci/ci.sh fmt
+
+deploy:
+  provider: releases
+  name: test
+  overwrite: true
+  edge: true
