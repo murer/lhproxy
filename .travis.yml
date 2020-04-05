@@ -5,5 +5,5 @@ services:
 
 script:
   - ./build.sh fmt
-  - git status --porcelain
+  - [[ -z "$(git status --porcelain)" ]]
   - ./build.sh test
