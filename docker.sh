@@ -7,6 +7,7 @@ docker_golang() {
     -v "$(pwd)":/go/src -w /go/src \
     --network host \
     -e "LHPROXY_SECRET=12345678901234561234567890123456" \
+    -u "$(id -u):$(id -g)" \
     golang:1.14 "$@"
 }
 
@@ -19,11 +20,11 @@ cmd_run() {
 cmd_runi() {
   istty=-i
   [[ -t 0 ]] && istty=-it
-  LHPROXY_DOCKER_EXTRA="$istty" cmd_run "$@"
+  LHPROXY_DOCKER_EXTRA="$LHPROXY_DOCKER_EXTRA $istty" cmd_run "$@"
 }
 
 cmd_rund() {
-  LHPROXY_DOCKER_EXTRA=-d cmd_run "$@"
+  LHPROXY_DOCKER_EXTRA="$LHPROXY_DOCKER_EXTRA -d" cmd_run "$@"
 }
 
 cd "$(dirname "$0")"; _cmd="${1?"cmd is required"}"; shift; "cmd_${_cmd}" "$@"
