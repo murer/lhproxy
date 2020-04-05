@@ -1,8 +1,12 @@
 #!/bin/bash -xe
 
 cmd_detect_version() {
-  echo "Branch: $TRAVIS_BRANCH"
-  echo "Tag: $TRAVIS_TAG"
+  mkdir build
+  LHPROXY_VERSION="$TRAVIS_TAG"
+  if [[ -z "$LHPROXY_VERSION" ]]; then
+    LHPROXY_VERSION="branch-$TRAVIS_BRANCH"
+  fi
+  echo "$LHPROXY_VERSION" > build/version.txt
 }
 
 cmd_build() {
