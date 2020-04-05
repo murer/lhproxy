@@ -2,13 +2,15 @@
 
 find_dirs_by_file() {
   set +x
-  find -name "${1?'pattern, like: *.go'}" | grep -v "\.git" | \
+  find "${1?'base dir for find, use . for all'}" -name "${2?'pattern, like: *.go'}" | grep -v "\.git" | \
     while read k; do dirname "$k"; done | sort | uniq
   set -x
 }
 
 cmd_test() {
-  find_dirs_by_file '*_test.go' | xargs go test "$@"
+  findbase="${1?"path is required, may be ."}"
+  shift
+  find_dirs_by_file "$findbase" '*_test.go' | xargs go test "$@"
   #go test ./pipe ./server ./util ./util/queue ./test ./cmd "$@"
 }
 
