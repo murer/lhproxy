@@ -1,16 +1,16 @@
 #!/bin/bash -xe
 
 cmd_detect_version() {
-  export LHPROXY_VERSION="$TRAVIS_TAG"
+  mkdir build
+  LHPROXY_VERSION="$TRAVIS_TAG"
   if [[ -z "$LHPROXY_VERSION" ]]; then
-    export LHPROXY_VERSION="branch-$TRAVIS_BRANCH"
+    LHPROXY_VERSION="branch-$TRAVIS_BRANCH"
   fi
-  export LHPROXY_VERSION
-  export GITHUB_TAG_NAME="$LHPROXY_VERSION"
+  echo "$LHPROXY_VERSION" > build/version.txt
+
 }
 
 cmd_build() {
-  # LHPROXY_VERSION="$(cat build/version.txt)"
   ./docker.sh runi golang ./build.sh test .
   ./docker.sh runi golang ./build.sh build linux amd64 "$LHPROXY_VERSION"
   [[ -z "$(git status --porcelain)" ]]
