@@ -1,1 +1,4 @@
 language: minimal
+
+script:
+  - ./build.sh test
