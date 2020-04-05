@@ -10,7 +10,7 @@ script:
   - export LHPROXY_VERSION="$(cat build/version.txt)"
   - export GITHUB_TAG_NAME="$LHPROXY_VERSION"
   - ./ci/ci.sh build
-  # - ./ci/ci.sh fmt
+  - ./ci/ci.sh fmt
 
 deploy:
   provider: releases
