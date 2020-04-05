@@ -6,6 +6,12 @@ cmd_build() {
   docker build -t lhproxy/lhproxy:dev .
 }
 
+cmd_push() {
+  lhproxy_docker_version="${1?"version to push"}"
+  docker tag lhproxy/lhproxy:dev "murer/lhproxy:$lhproxy_docker_version"
+  docker push "murer/lhproxy:$lhproxy_docker_version"
+}
+
 docker_lhproxy() {
   docker run $LHPROXY_DOCKER_EXTRA --rm --label lhproxy_dev \
     -u "$LHPROXY_USER_ID" lhproxy/lhproxy:dev "$@"
