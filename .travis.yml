@@ -17,6 +17,7 @@ deploy:
   name: test
   overwrite: true
   draft: true
+  file: build/pack/*
   edge: true
   on:
     tags: true
