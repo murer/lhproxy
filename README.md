@@ -27,5 +27,17 @@ LHPROXY_SECRET=myweaksecret lhproxy server 0.0.0.0:8080
 Start your tunnel from the client
 
 ```shell
-LHPROXY_SECRET=myweaksecret lhproxy client pipe http http://yourserver:8080 localhost:22
+$ LHPROXY_SECRET=myweaksecret lhproxy client pipe http http://yourserver:8080 google:443
+GET / HTTP/1.1
+Host: google.com
+```
+
+You will get something like:
+
+```
+HTTP/1.1 301 Moved Permanently
+Location: http://www.google.com/
+Content-Type: text/html; charset=UTF-8
+
+<HTML>...</HTML>
 ```
