@@ -14,7 +14,7 @@ cmd_test() {
 }
 
 cmd_fmt() {
-  find_dirs_by_file "." '*.go' | while read k; do go fmt -x "$k" ; done
+  find_dirs_by_file "." '*.go' | while read k; do go fmt "$k" ; done
 }
 
 cmd_build() {
