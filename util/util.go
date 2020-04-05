@@ -48,5 +48,5 @@ func Secret() []byte {
 	if ret == "" {
 		log.Panicf("LHPROXY_SECRET not found")
 	}
-	return []byte(ret)
+	return SHA256([]byte(ret))
 }
