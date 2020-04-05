@@ -13,12 +13,20 @@ cmd_detect_version() {
 cmd_build() {
   ./docker.sh runi golang ./build.sh test .
   ./docker.sh runi golang ./build.sh build_all "$LHPROXY_VERSION"
+  ./docker.sh build
   [[ -z "$(git status --porcelain)" ]]
 }
 
 cmd_fmt() {
   ./docker.sh runi golang ./build.sh fmt
   [[ -z "$(git status --porcelain)" ]]
+}
+
+cmd_deploy_docker() {
+  set +x
+  docker login --username "$DOCKERHUB_USER" --password "$DOCKERHUB_PASS"
+  set -x
+  ./docker.sh push
 }
 
 cd "$(dirname "$0")/.."; _cmd="${1?"cmd is required"}"; shift; "cmd_${_cmd}" "$@"
