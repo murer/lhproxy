@@ -13,3 +13,17 @@ Download from <a href="https://github.com/murer/lhproxy/releases">Github Release
 ```shell
 docker run -it murer/lhproxy:latest lhproxy help
 ```
+
+### Basics
+
+Start the server somewhere
+
+```shell
+LHPROXY_SECRET=myweaksecret lhproxy server 0.0.0.0:8080
+```
+
+Start your tunnel from the client
+
+```shell
+LHPROXY_SECRET=myweaksecret lhproxy client pipe http http://yourserver:8080 localhost:22
+```
