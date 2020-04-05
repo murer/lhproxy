@@ -7,5 +7,5 @@ import (
 
 func main() {
 	cmd.Config()
-	cmd.Execute()
+	  cmd.Execute()
 }

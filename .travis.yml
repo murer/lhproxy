@@ -4,4 +4,6 @@ services:
   - docker
 
 script:
+  - ./build.sh fmt
+  - git status --porcelain
   - ./build.sh test
