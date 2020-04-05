@@ -10,12 +10,20 @@ cmd_run() {
     golang:1.14 "$@"
 }
 
-cmd_tty() {
+cmd_runi() {
+  LHPROXY_DOCKER_EXTRA=-i cmd_run "$@"
+}
+
+cmd_runit() {
   LHPROXY_DOCKER_EXTRA=-it cmd_run "$@"
 }
 
+cmd_rund() {
+  LHPROXY_DOCKER_EXTRA=-d cmd_run "$@"
+}
+
 cmd_test() {
-  LHPROXY_DOCKER_EXTRA=-i cmd_run go test \
+  cmd_runi go test \
     ./pipe ./server ./util ./util/queue ./test ./cmd "$@"
 }
 
@@ -28,6 +36,13 @@ cmd_fmt() {
       LHPROXY_DOCKER_EXTRA=-i cmd_run go fmt -x
     done
   set -x
+}
+
+cmd_sshtest() {
+  ssh localhost whoami
+  ssh -o "ProxyCommand ./build.sh runi go run main.go client pipe native %h:%p" localhost whoami
+  ssh -o "ProxyCommand ./build.sh runi go run main.go client pipe lhproxy http://localhost:8080/ %h:%p" localhost whoami
+  echo SUCCESS
 }
 
 cd "$(dirname "$0")"; _cmd="${1?"cmd is required"}"; shift; "cmd_${_cmd}" "$@"
