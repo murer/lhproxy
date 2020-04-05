@@ -6,6 +6,6 @@ import (
 )
 
 func main() {
-	cmd.Config()
+	  cmd.Config()
 	cmd.Execute()
 }
