@@ -43,10 +43,10 @@ func WriteFully(w io.Writer, buf []byte) {
 	}
 }
 
-func Secret() string {
+func Secret() []byte {
 	ret := os.Getenv("LHPROXY_SECRET")
 	if ret == "" {
 		log.Panicf("LHPROXY_SECRET not found")
 	}
-	return ret
+	return []byte(ret)
 }

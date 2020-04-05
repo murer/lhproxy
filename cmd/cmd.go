@@ -47,7 +47,7 @@ func configServer() {
 		Use: "server <host>:<port>",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			server.Start(args[0])
+			server.Start(args[0], util.Secret())
 			return nil
 		},
 	})
@@ -76,7 +76,7 @@ func configPipe() {
 			p := &pipe.Pipe{
 				Scks: &server.HttpSockets{
 					URL:args[0],
-					Secret: util.Secret()
+					Secret: util.Secret(),
 				},
 				Address: args[1],
 				Reader: os.Stdin,
