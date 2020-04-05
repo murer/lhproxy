@@ -4,16 +4,8 @@ services:
   - docker
 
 before_install:
-  - hub release create -h
   - ./ci/ci.sh detect_version
 
 script:
   - ./ci/ci.sh build
   # - ./ci/ci.sh fmt
-
-deploy:
-  provider: releases
-  name: test
-  overwrite: true
-  draft: true
-  edge: true
