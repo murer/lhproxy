@@ -2,6 +2,15 @@
 
 LHPROXY_USER_ID="$(id -u):$(id -g)"
 
+cmd_build() {
+  docker build -t lhproxy/lhproxy:dev .
+}
+
+docker_lhproxy() {
+  docker run $LHPROXY_DOCKER_EXTRA --rm --label lhproxy_dev \
+    -u "$LHPROXY_USER_ID" lhproxy/lhproxy:dev "$@"
+}
+
 docker_golang() {
   docker volume create lhproxy_golang_dev --label lhproxy_dev || true
   docker run $LHPROXY_DOCKER_EXTRA --rm --label lhproxy_dev \

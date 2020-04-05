@@ -48,11 +48,6 @@ cmd_build_all() {
   cmd_build linux amd64
 }
 
-cmd_pack() {
-  cp
-
-}
-
 cmd_sshtest() {
   ssh localhost whoami
   ssh -o "ProxyCommand ./build.sh runi go run main.go client pipe native %h:%p" localhost whoami
