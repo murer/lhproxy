@@ -1,5 +1,10 @@
 #!/bin/bash -xe
 
+cmd_detect_version() {
+  echo "Branch: $TRAVIS_BRANCH"
+  echo "Tag: $TRAVIS_TAG"
+}
+
 cmd_build() {
   ./docker.sh runi golang ./build.sh test .
   ./docker.sh runi golang ./build.sh build_all dev

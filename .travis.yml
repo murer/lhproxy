@@ -4,7 +4,7 @@ services:
   - docker
 
 before_install:
-  - env
+  - ./ci/ci.sh detect_version
 
 script:
   - ./ci/ci.sh build
