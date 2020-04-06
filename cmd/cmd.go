@@ -82,7 +82,7 @@ func configPipe() {
 	})
 
 	pipeCmd.AddCommand(&cobra.Command{
-		Use:  "http <lhproxy:port> <host>:<port>",
+		Use:  "http http://<lhproxy:port>/ <host>:<port>",
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			p := &pipe.Pipe{

@@ -16,7 +16,8 @@ script:
 deploy:
   - provider: releases
     overwrite: true
-    draft: true
+    draft: false
+    prerelease: false
     file: build/pack/*
     edge: true
     on:
