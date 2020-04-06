@@ -2,7 +2,12 @@
 
 **LastHopeProxy** is a encrypted port forward through HTTP
 
-```
+For **Linux**, **Windows** and **Mac**
+
+[![Build Status](https://travis-ci.org/murer/lhproxy.svg?branch=master)](https://travis-ci.org/murer/lhproxy)
+
+
+```asc
 +-----------------------+   The real connection                   
 |        LHProxy        |   from you to the server                
 |    Last Hope Proxy    ---------------------------+              
@@ -38,10 +43,6 @@
             |                       |                             
             +-----------------------+                             
 ```
-
-For **Linux**, **Windows** and **Mac**
-
-[![Build Status](https://travis-ci.org/murer/lhproxy.svg?branch=master)](https://travis-ci.org/murer/lhproxy)
 
 ### Download
 
