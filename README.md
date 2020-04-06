@@ -27,7 +27,7 @@ LHPROXY_SECRET=myweaksecret lhproxy server 0.0.0.0:8080
 Start your tunnel from the client
 
 ```bash
-$ LHPROXY_SECRET=myweaksecret lhproxy client pipe http http://yourserver:8080 google:80
+LHPROXY_SECRET=myweaksecret lhproxy client pipe http http://yourserver:8080 google:80
 ```
 
 Send it
