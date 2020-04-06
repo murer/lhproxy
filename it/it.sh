@@ -13,6 +13,7 @@ cleanup
 cd ..
 docker build -t lhproxy/it:dev -f it/Dockerfile .
 cd -
+
 docker run -d --rm --label lhproxy_dev --name lhproxy_it_squid \
   -p 3128:3128 -h lhproxy_it_squid lhproxy/it:dev /root/entrypoint/server.sh
 

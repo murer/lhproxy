@@ -7,13 +7,13 @@ cmd_detect_version() {
     LHPROXY_VERSION="branch-$TRAVIS_BRANCH"
   fi
   echo "$LHPROXY_VERSION" > build/version.txt
-
 }
 
 cmd_build() {
   ./docker.sh runi golang ./build.sh test .
   ./docker.sh runi golang ./build.sh build_all "$LHPROXY_VERSION"
   ./docker.sh build
+  ./it/it.sh
   [[ -z "$(git status --porcelain)" ]]
 }
 
