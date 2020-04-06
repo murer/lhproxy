@@ -3,10 +3,10 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
+	"io/ioutil"
+	"log"
 	"os"
 	"runtime"
-	"log"
-	"io/ioutil"
 
 	"github.com/murer/lhproxy/pipe"
 	"github.com/murer/lhproxy/server"
