@@ -1,6 +1,43 @@
 # LHProxy
 
-**LastHopeProxy** does a ``TCP`` **encrypted** tunnel over ``HTTP`` (not ``HTTPS`` or ``CONNECT``).
+**LastHopeProxy** is a encrypted port forward through HTTP
+
+```
++-----------------------+   The real connection                   
+|        LHProxy        |   from you to the server                
+|    Last Hope Proxy    ---------------------------+              
+|                       |   Maybe SSH, IRC, HTTP   |              
++-----|-----------------+   or whatever            |              
+      |                                            |              
+      |                          +-----------------|-----+        
+      |                          |      Unreachable      |        
+      |                          |         SERVER        |        
+      |                          |                       |        
+      |                          +-----------|-----------+        
+      | The forwarded HTTP                   |                    
+      | request/response with                |                    
+      | a bunch of unreadable                                     
+      | binary data inside                Impossible              
+      |                                     Path                  
+      |                                                           
+      |                                      |                    
+      |     +-----------------------+        |                    
+      |     | A Very Boring Firwall |        |                    
+      +------       or Proxy        ---------+                    
+            |                       |                             
+            +-----------|-----------+                             
+ POST http://lhproxy/   |                                         
+ Encrypted Request Body |                                         
+                        |                                         
+ 200 OK HTTP/1.1        |                                         
+ Encrypted Reponse Body |                                         
+                        |                                         
+            +-----------|-----------+                             
+            |          YOU          |                             
+            |       the Client      |                             
+            |                       |                             
+            +-----------------------+                             
+```
 
 For **Linux**, **Windows** and **Mac**
 
