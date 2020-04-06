@@ -1,6 +1,6 @@
 # LHProxy
 
-**Last Hope Proxy** does a ``TCP`` **encrypted** tunnel over ``HTTP`` (not ``HTTPS`` or ``CONNECT``).
+**LastHopeProxy** does a ``TCP`` **encrypted** tunnel over ``HTTP`` (not ``HTTPS`` or ``CONNECT``).
 
 For **Linux**, **Windows** and **Mac**
 
