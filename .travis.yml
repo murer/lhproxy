@@ -15,7 +15,7 @@ script:
 
 # deploy:
 #   - provider: releases
-#     overwrite: true
+#     overwrite: false
 #     draft: false
 #     prerelease: false
 #     file: build/pack/*
