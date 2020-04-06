@@ -32,9 +32,9 @@ cmd_build() {
   CGO_ENABLED="0" GOOS="$lhproxy_goos" GOARCH="$lhproxy_goarch" \
     go build -a -trimpath -ldflags "$lhproxy_ldflags" \
       -installsuffix cgo -tags netgo -mod mod \
-      -o "build/out/$lhproxy_goos-$lhproxy_goarch/lhproxy-$lhproxy_version/$lhproxy_excname" .
+      -o "build/out/$lhproxy_goos-$lhproxy_goarch/lhproxy/$lhproxy_excname" .
   cd "build/out/$lhproxy_goos-$lhproxy_goarch"
-  tar cvzf "../../pack/lhproxy-$lhproxy_goos-$lhproxy_goarch-$lhproxy_version.tar.gz" "lhproxy-$lhproxy_version"
+  tar cvzf "../../pack/lhproxy-$lhproxy_goos-$lhproxy_goarch-$lhproxy_version.tar.gz" "lhproxy"
   cd -
 }
 

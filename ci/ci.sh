@@ -11,11 +11,11 @@ cmd_detect_version() {
 
 cmd_build() {
   ./docker.sh runi golang go version
-  # ./it/it.sh build base 1> /dev/null 2>&1 &
+  ./it/it.sh build base 1> /dev/null 2>&1 &
   ./docker.sh runi golang ./build.sh test .
   ./docker.sh runi golang ./build.sh build_all "$LHPROXY_VERSION"
-  # wait %1
-  # ./it/it.sh it
+   wait %1
+  ./it/it.sh it
   ./docker.sh build
   [[ -z "$(git status --porcelain)" ]]
 }
