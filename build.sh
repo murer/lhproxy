@@ -34,7 +34,7 @@ cmd_build() {
       -installsuffix cgo -tags netgo -mod mod \
       -o "build/out/$lhproxy_goos-$lhproxy_goarch/lhproxy-$lhproxy_version/$lhproxy_excname" .
   cd "build/out/$lhproxy_goos-$lhproxy_goarch"
-  tar czf "../../pack/lhproxy-$lhproxy_goos-$lhproxy_goarch-$lhproxy_version.tar.gz" "lhproxy-$lhproxy_version"
+  tar cvzf "../../pack/lhproxy-$lhproxy_goos-$lhproxy_goarch-$lhproxy_version.tar.gz" "lhproxy-$lhproxy_version"
   cd -
 }
 
