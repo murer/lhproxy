@@ -12,7 +12,7 @@ Download from <a href="https://github.com/murer/lhproxy/releases">Github Release
 
 ### Docker
 
-```shell
+```bash
 docker run -it murer/lhproxy:latest lhproxy help
 ```
 
@@ -20,21 +20,26 @@ docker run -it murer/lhproxy:latest lhproxy help
 
 Start the server somewhere
 
-```shell
+```bash
 LHPROXY_SECRET=myweaksecret lhproxy server 0.0.0.0:8080
 ```
 
 Start your tunnel from the client
 
-```shell
+```bash
 $ LHPROXY_SECRET=myweaksecret lhproxy client pipe http http://yourserver:8080 google:80
+```
+
+Send it
+
+```http
 GET / HTTP/1.1
 Host: google.com
 ```
 
 You will get something like:
 
-```
+```http
 HTTP/1.1 301 Moved Permanently
 Location: http://www.google.com/
 Content-Type: text/html; charset=UTF-8
