@@ -4,7 +4,7 @@
 
 For **Linux**, **Windows** and **Mac**
 
-[![LHProxy](https://travis-ci.org/murer/lhproxy.svg)](https://travis-ci.org/github/murer/lhproxy)
+[![Build Status](https://travis-ci.org/murer/lhproxy.svg?branch=master)](https://travis-ci.org/murer/lhproxy)
 
 ### Download
 
