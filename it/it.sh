@@ -6,8 +6,9 @@ cmd_cleanup() {
 }
 
 cmd_build() {
+  lhproxy_it_target="${1:-final}"
   cd ..
-  docker build -t lhproxy/it:dev -f it/Dockerfile .
+  docker build -t lhproxy/it:dev --target "$lhproxy_it_target" -f it/Dockerfile .
   cd -
 }
 

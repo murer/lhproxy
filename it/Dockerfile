@@ -1,4 +1,4 @@
-FROM alpine:3.11
+FROM alpine:3.11 AS base
 
 RUN apk add --update openssh squid bash vim
 
@@ -26,4 +26,5 @@ RUN dd if=/dev/random count=1 bs=12 | base64 > /root/secret.txt
 COPY it/entrypoint /root/entrypoint
 RUN chmod +x /root/entrypoint/*.sh
 
+FROM base AS final
 COPY build/out/linux-amd64/lhproxy-dev/lhproxy /usr/local/bin
