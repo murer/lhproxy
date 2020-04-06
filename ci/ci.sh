@@ -1,4 +1,4 @@
-#!/bin/bash -xe
+#!/bin/bash -e
 
 cmd_detect_version() {
   mkdir build
@@ -27,7 +27,6 @@ cmd_fmt() {
 cmd_deploy_docker() {
   set +x
   docker login --username "$DOCKERHUB_USER" --password "$DOCKERHUB_PASS"
-  set -x
   LHPROXY_DOCKER_VERSION="$(echo "$LHPROXY_VERSION" | cut -d'-' -f2-)"
   ./docker.sh push "$LHPROXY_DOCKER_VERSION"
   ./docker.sh push latest

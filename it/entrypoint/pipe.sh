@@ -1,4 +1,4 @@
-#!/bin/bash -xe
+#!/bin/bash -e
 
 export LHPROXY_SECRET="$(cat /root/secret.txt)"
 export HTTP_PROXY=http://localhost:3128/

@@ -1,10 +1,8 @@
-#!/bin/bash -xe
+#!/bin/bash -e
 
 find_dirs_by_file() {
-  set +x
   find "${1?'base dir for find, use . for all'}" -name "${2?'pattern, like: *.go'}" | \
     grep -v "\.git" | while read k; do dirname "$k"; done | sort | uniq
-  set -x
 }
 
 cmd_clean() {
