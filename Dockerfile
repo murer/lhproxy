@@ -1,5 +1,5 @@
 FROM scratch
 WORKDIR /lhproxy
-ENV HOME /lhproxy
+ENV PATH /lhproxy
 ADD ./build/out/linux-amd64/lhproxy/lhproxy .
-CMD [ "./lhproxy", "help" ]
+CMD [ "lhproxy", "help" ]
