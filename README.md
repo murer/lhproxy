@@ -9,7 +9,7 @@ For **Linux**, **Windows** and **Mac**
 
 ```asc
  +-----------------------+   The real connection            
- |        LHProxy        |   from you to the server         
+ |        LHProxy        |   from YOU to the SERVER         
  |    Last Hope Proxy    ---------------------------+       
  |                       |   Maybe SSH, IRC, HTTP   |       
  +-----|-----------------+   or whatever            |       
