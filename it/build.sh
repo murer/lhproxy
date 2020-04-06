@@ -2,8 +2,13 @@
 
 cd "$(dirname "$0")"
 
-docker rm -f lhproxy_it_squid || true
-docker rm -f lhproxy_it_pipe || true
+cleanup() {
+  docker rm -f lhproxy_it_squid || true
+  docker rm -f lhproxy_it_pipe || true
+}
+trap cleanup EXIT
+
+cleanup
 
 cd ..
 docker build -t lhproxy/it:dev -f it/Dockerfile .
