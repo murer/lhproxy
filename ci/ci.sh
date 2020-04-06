@@ -29,7 +29,7 @@ cmd_deploy_docker() {
   set +x
   docker login --username "$DOCKERHUB_USER" --password "$DOCKERHUB_PASS"
   set -x
-  if echo "$LHPROXY_VERSION" | grep "^branch-master$"; then
+  if echo "$LHPROXY_VERSION" | grep "^master$"; then
     echo ./docker.sh push "$LHPROXY_VERSION"
   elif echo "$LHPROXY_VERSION" | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+"; then
     echo ./docker.sh push "$LHPROXY_VERSION"
