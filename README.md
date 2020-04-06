@@ -7,7 +7,7 @@ For **Linux**, **Windows** and **Mac**
 [![Build Status](https://travis-ci.org/murer/lhproxy.svg?branch=master)](https://travis-ci.org/murer/lhproxy)
 
 
-```asc
+```
  +-----------------------+   The real connection            
  |        LHProxy        |   from YOU to the SERVER         
  |    Last Hope Proxy    ---------------------------+       
