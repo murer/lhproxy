@@ -1,10 +1,13 @@
 #!/bin/bash -xe
 
 cmd_detect_version() {
-  mkdir build
-  LHPROXY_VERSION="$TRAVIS_TAG"
-  if [[ -z "$LHPROXY_VERSION" ]]; then
+  mkdir -p build
+  LHPROXY_VERSION="tag-$TRAVIS_TAG"
+  if [[ "x$LHPROXY_VERSION" == "xtag-" ]]; then
     LHPROXY_VERSION="branch-$TRAVIS_BRANCH"
+  fi
+  if echo "$LHPROXY_VERSION" | grep "^tag-lhproxy\-"; then
+    LHPROXY_VERSION="$(echo "$LHPROXY_VERSION" | cut -b13-)"
   fi
   echo "$LHPROXY_VERSION" > build/version.txt
 }
