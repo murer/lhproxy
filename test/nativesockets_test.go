@@ -87,7 +87,7 @@ func TestIdle(t *testing.T) {
 	assert.Equal(t, []byte{5, 6}, scks.Read(cs, 2))
 
 	time.Sleep(400 * time.Millisecond)
-	scks.Close(cs, sockets.CLOSE_SCK)
+	// scks.Close(cs, sockets.CLOSE_SCK)
 
 	assert.Panics(t, func() {
 		scks.Read(cs, 2)
