@@ -64,8 +64,6 @@ func GetNative() sockets.Sockets {
 	return &sockets.NativeSockets{
 		ReadTimeout:       1 * time.Millisecond,
 		AcceptTimeout:     1 * time.Millisecond,
-		SocketIdleTimeout: 1000 * time.Millisecond,
-		ListenIdleTimeout: 1000 * time.Millisecond,
 	}
 }
 
@@ -78,10 +76,8 @@ func TestIdle(t *testing.T) {
 	scks := &sockets.NativeSockets{
 		ReadTimeout:       1 * time.Millisecond,
 		AcceptTimeout:     1 * time.Millisecond,
-		SocketIdleTimeout: 200 * time.Millisecond,
-		ListenIdleTimeout: 600 * time.Millisecond,
 	}
-	go scks.IdleStart()
+	go scks.IdleStart(200, 600)
 
 	listen := scks.Listen("127.0.0.1:5001")
 	defer scks.Close(listen, sockets.CLOSE_SCK)
