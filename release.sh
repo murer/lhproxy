@@ -8,8 +8,7 @@ cmd_version() {
 }
 
 cmd_edge() {
-  git tag edge
-  git push origin edge
+  cmd_force edge
 }
 
 cmd_force() {
