@@ -41,12 +41,9 @@ cmd_build() {
 cmd_build_all() {
   lhproxy_version="${1?"version"}"
   rm -rf "build/out" "build/pack" || true
-  cmd_build windows amd64 "$lhproxy_version" &
-  cmd_build darwin amd64 "$lhproxy_version" &
-  cmd_build linux amd64 "$lhproxy_version" &
-  wait %1
-  wait %2
-  wait %3
+  cmd_build windows amd64 "$lhproxy_version"
+  cmd_build darwin amd64 "$lhproxy_version"
+  cmd_build linux amd64 "$lhproxy_version"
 }
 
 cmd_sshtest() {
