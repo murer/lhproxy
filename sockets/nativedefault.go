@@ -8,11 +8,12 @@ var native *NativeSockets = nil
 
 func GetNative() Sockets {
 	if native == nil {
-		log.Printf("Creating defaut NativeSockets")
-		native = &NativeSockets{
+		ret := &NativeSockets{
 			ReadTimeout:       30 * time.Second,
 			AcceptTimeout:     30 * time.Second,
 		}
+		go ret.IdleStart(5 * time.Minute, 0 * time.Minute)
+		native = ret
 	}
 	return native
 }
