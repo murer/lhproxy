@@ -12,4 +12,10 @@ cmd_edge() {
   git push origin edge
 }
 
+cmd_force() {
+  lhproxy_version="${1?'version, like: x.x.x'}"
+  echo git tag "$lhproxy_version" -f
+  echo git push origin "$lhproxy_version" -f
+}
+
 cd "$(dirname "$0")"; _cmd="${1?"cmd is required"}"; shift; "cmd_${_cmd}" "$@"
