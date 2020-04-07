@@ -77,7 +77,7 @@ func TestIdle(t *testing.T) {
 		ReadTimeout:       1 * time.Millisecond,
 		AcceptTimeout:     1 * time.Millisecond,
 	}
-	go scks.IdleStart(200, 600)
+	go scks.IdleStart(200 * time.Millisecond, 600 * time.Millisecond)
 
 	listen := scks.Listen("127.0.0.1:5001")
 	defer scks.Close(listen, sockets.CLOSE_SCK)

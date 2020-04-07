@@ -6,12 +6,12 @@ import (
 	"time"
 )
 
-func computeIdleInterval(scks *NativeSockets) time.Duration {
-	interval := scks.SocketIdleTimeout
+func computeIdleInterval(socketTimeout time.Duration, listenTimeout time.Duration) time.Duration {
+	interval := socketTimeout
 	if interval == 0 {
-		interval = scks.ListenIdleTimeout
-	} else if scks.ListenIdleTimeout > 0 && scks.ListenIdleTimeout < interval {
-		interval = scks.ListenIdleTimeout
+		interval = listenTimeout
+	} else if listenTimeout > 0 && listenTimeout < interval {
+		interval = listenTimeout
 	}
 	interval = interval / 10
 	return interval
@@ -26,22 +26,22 @@ func (scks *NativeSockets) closeIfIdle(name string, lastModified time.Time, time
 	}
 }
 
-func (scks *NativeSockets) idleCheck() {
+func (scks *NativeSockets) idleCheck(socketTimeout time.Duration, listenTimeout time.Duration) {
 	for _, conn := range conns {
-		scks.closeIfIdle(conn.id, conn.lastUsed, scks.SocketIdleTimeout)
+		scks.closeIfIdle(conn.id, conn.lastUsed, socketTimeout)
 	}
 	for _, conn := range lns {
-		scks.closeIfIdle(conn.id, conn.lastUsed, scks.ListenIdleTimeout)
+		scks.closeIfIdle(conn.id, conn.lastUsed, listenTimeout)
 	}
 }
 
-func (scks *NativeSockets) IdleStart() {
-	interval := computeIdleInterval(scks)
+func (scks *NativeSockets) IdleStart(socketTimeout time.Duration, listenTimeout time.Duration) {
+	interval := computeIdleInterval(socketTimeout, listenTimeout)
 	if interval == 0 {
 		return
 	}
 	for true {
 		time.Sleep(interval)
-		scks.idleCheck()
+		scks.idleCheck(socketTimeout, listenTimeout)
 	}
 }
