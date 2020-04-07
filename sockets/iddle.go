@@ -26,8 +26,6 @@ func (scks *NativeSockets) idleControl(name string) {
 	if interval == 0 {
 		return
 	}
-	log.Printf("[%s] Starting idle control: %s", name, interval)
-	defer log.Printf("[%s] Stoping idle control", name)
 	for true {
 		time.Sleep(interval)
 		timeout := scks.SocketIdleTimeout
@@ -41,7 +39,6 @@ func (scks *NativeSockets) idleControl(name string) {
 		}
 		limit := sck.GetLastUsed().Add(timeout)
 		remaning := limit.Sub(time.Now())
-		log.Printf("[%s] Idle control check lastUsed: %d", name, remaning)
 		if remaning <= 0 {
 			log.Printf("[%s] Closing idle conn: %d", name, remaning)
 			scks.Close(name, CLOSE_SCK)
