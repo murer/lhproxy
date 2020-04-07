@@ -35,21 +35,15 @@ deploy:
   #     condition: $TRAVIS_TAG =~ ^[0-9]\+\.[0-9]\+\.[0-9]\+$
 
 
-# script: ./ci/ci.sh deploy_docker
-
   - provider: script
-    script:
-      - echo "$TRAVIS_TAG"
-      - echo bbb
     edge: true
+    script: ./ci/ci.sh deploy_docker latest
     on:
       tags: true
       condition: $TRAVIS_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+$
 
   - provider: script
-    script:
-      - echo "$TRAVIS_TAG"
-      - echo aaa
+    script: ./ci/ci.sh deploy_docker
     edge: true
     on:
       tags: true

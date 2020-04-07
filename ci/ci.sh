@@ -26,10 +26,14 @@ cmd_fmt() {
 }
 
 cmd_deploy_docker() {
+  lhproxy_ver_alias="$1"
   set +x
   docker login --username "$DOCKERHUB_USER" --password "$DOCKERHUB_PASS"
   set -x
   echo ./docker.sh push "$LHPROXY_VERSION"
+  if [[ "x$lhproxy_ver_alias" != "x" ]]; then
+    echo ./docker.sh push "$lhproxy_ver_alias"
+  fi
 }
 
 cd "$(dirname "$0")/.."; _cmd="${1?"cmd is required"}"; shift; "cmd_${_cmd}" "$@"
