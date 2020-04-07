@@ -62,8 +62,8 @@ func SocksTest(t *testing.T, scks sockets.Sockets) {
 
 func GetNative() sockets.Sockets {
 	return &sockets.NativeSockets{
-		ReadTimeout: 1 * time.Millisecond,
-		AcceptTimeout: 1 * time.Millisecond,
+		ReadTimeout:       1 * time.Millisecond,
+		AcceptTimeout:     1 * time.Millisecond,
 		SocketIdleTimeout: 1000 * time.Millisecond,
 		AcceptIdleTimeout: 1000 * time.Millisecond,
 	}
@@ -76,8 +76,8 @@ func TestNativeSockets(t *testing.T) {
 
 func TestIdle(t *testing.T) {
 	scks := &sockets.NativeSockets{
-		ReadTimeout: 1 * time.Millisecond,
-		AcceptTimeout: 1 * time.Millisecond,
+		ReadTimeout:       1 * time.Millisecond,
+		AcceptTimeout:     1 * time.Millisecond,
 		SocketIdleTimeout: 200 * time.Millisecond,
 		AcceptIdleTimeout: 600 * time.Millisecond,
 	}

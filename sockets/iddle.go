@@ -1,9 +1,9 @@
 package sockets
 
 import (
-	"time"
-	"reflect"
 	"log"
+	"reflect"
+	"time"
 )
 
 type IdleController interface {

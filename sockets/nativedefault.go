@@ -5,8 +5,8 @@ import (
 )
 
 var native = &NativeSockets{
-	ReadTimeout: 30 * time.Second,
-	AcceptTimeout: 30 * time.Second,
+	ReadTimeout:       30 * time.Second,
+	AcceptTimeout:     30 * time.Second,
 	SocketIdleTimeout: 5 * time.Minute,
 	AcceptIdleTimeout: 0 * time.Minute,
 }
