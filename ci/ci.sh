@@ -30,9 +30,9 @@ cmd_deploy_docker() {
   set +x
   docker login --username "$DOCKERHUB_USER" --password "$DOCKERHUB_PASS"
   set -x
-  echo ./docker.sh push "$LHPROXY_VERSION"
+  ./docker.sh push "$LHPROXY_VERSION"
   if [[ "x$lhproxy_ver_alias" != "x" ]]; then
-    echo ./docker.sh push "$lhproxy_ver_alias"
+    ./docker.sh push "$lhproxy_ver_alias"
   fi
 }
 
