@@ -2,47 +2,46 @@ package sockets
 
 import (
 	"log"
-	"reflect"
+	// "reflect"
 	"time"
 )
-
-type IdleController interface {
-	GetLastUsed() time.Time
-}
 
 func computeIdleInterval(scks *NativeSockets) time.Duration {
 	interval := scks.SocketIdleTimeout
 	if interval == 0 {
-		interval = scks.AcceptIdleTimeout
-	} else if scks.AcceptIdleTimeout > 0 && scks.AcceptIdleTimeout < interval {
-		interval = scks.AcceptIdleTimeout
+		interval = scks.ListenIdleTimeout
+	} else if scks.ListenIdleTimeout > 0 && scks.ListenIdleTimeout < interval {
+		interval = scks.ListenIdleTimeout
 	}
 	interval = interval / 10
 	return interval
 }
 
-func (scks *NativeSockets) idleControl(name string) {
+func (scks *NativeSockets) closeIfIdle(name string, lastModified time.Time, timeout time.Duration) {
+	limit := lastModified.Add(timeout)
+	remaning := limit.Sub(time.Now())
+	if remaning <= 0 {
+		log.Printf("[%s] Closing idle conn: %d", name, remaning)
+		scks.Close(name, CLOSE_SCK)
+	}
+}
+
+func (scks *NativeSockets) idleCheck() {
+	for _, conn := range conns {
+		scks.closeIfIdle(conn.id, conn.lastUsed, scks.SocketIdleTimeout)
+	}
+	for _, conn := range lns {
+		scks.closeIfIdle(conn.id, conn.lastUsed, scks.ListenIdleTimeout)
+	}
+}
+
+func (scks *NativeSockets) IdleStart() {
 	interval := computeIdleInterval(scks)
 	if interval == 0 {
 		return
 	}
 	for true {
 		time.Sleep(interval)
-		timeout := scks.SocketIdleTimeout
-		var sck IdleController = conns[name]
-		if sck == nil || reflect.ValueOf(sck).IsNil() {
-			sck = lns[name]
-			timeout = scks.AcceptIdleTimeout
-		}
-		if sck == nil || reflect.ValueOf(sck).IsNil() {
-			return
-		}
-		limit := sck.GetLastUsed().Add(timeout)
-		remaning := limit.Sub(time.Now())
-		if remaning <= 0 {
-			log.Printf("[%s] Closing idle conn: %d", name, remaning)
-			scks.Close(name, CLOSE_SCK)
-		}
+		scks.idleCheck()
 	}
-
 }

@@ -88,7 +88,7 @@ type NativeSockets struct {
 	ReadTimeout       time.Duration
 	AcceptTimeout     time.Duration
 	SocketIdleTimeout time.Duration
-	AcceptIdleTimeout time.Duration
+	ListenIdleTimeout time.Duration
 }
 
 func (scks *NativeSockets) Listen(addr string) string {
@@ -100,7 +100,6 @@ func (scks *NativeSockets) Listen(addr string) string {
 		lastUsed: time.Now(),
 	}
 	lns[l.id] = l
-	go scks.idleControl(l.id)
 	log.Printf("[%s] Listening", l.id)
 	return l.id
 }
@@ -119,7 +118,6 @@ func (scks *NativeSockets) Accept(name string) string {
 		return ""
 	}
 	conns[conn.id] = conn
-	go scks.idleControl(conn.id)
 	log.Printf("[%s] Accepted", conn.id)
 	return conn.id
 }
@@ -133,7 +131,6 @@ func (scks *NativeSockets) Connect(addr string) string {
 		lastUsed: time.Now(),
 	}
 	conns[c.id] = c
-	go scks.idleControl(c.id)
 	log.Printf("[%s] Connected", c.id)
 	return c.id
 }
