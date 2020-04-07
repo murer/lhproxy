@@ -29,12 +29,7 @@ cmd_deploy_docker() {
   set +x
   docker login --username "$DOCKERHUB_USER" --password "$DOCKERHUB_PASS"
   set -x
-  if echo "$LHPROXY_VERSION" | grep "^master$"; then
-    echo ./docker.sh push "$LHPROXY_VERSION"
-  elif echo "$LHPROXY_VERSION" | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+"; then
-    echo ./docker.sh push "$LHPROXY_VERSION"
-    echo ./docker.sh push latest
-  fi
+  echo ./docker.sh push "$LHPROXY_VERSION"
 }
 
 cd "$(dirname "$0")/.."; _cmd="${1?"cmd is required"}"; shift; "cmd_${_cmd}" "$@"
