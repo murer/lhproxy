@@ -27,8 +27,6 @@ deploy:
   - provider: script
     script: ./ci/ci.sh deploy_docker
     edge: true
-    on:
-      tags: true
-      branches:
-        only: master
-      # condition: $TRAVIS_TAG =~ ^lhproxy-.*$
+    # on:
+    #   tags: true
+    #   condition: $TRAVIS_TAG =~ ^z*$
