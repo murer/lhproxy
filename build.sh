@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -xe
 
 find_dirs_by_file() {
   find "${1?'base dir for find, use . for all'}" -name "${2?'pattern, like: *.go'}" | \
@@ -44,13 +44,6 @@ cmd_build_all() {
   cmd_build windows amd64 "$lhproxy_version"
   cmd_build darwin amd64 "$lhproxy_version"
   cmd_build linux amd64 "$lhproxy_version"
-}
-
-cmd_sshtest() {
-  ssh localhost whoami
-  ssh -o "ProxyCommand ./build.sh runi go run main.go client pipe native %h:%p" localhost whoami
-  ssh -o "ProxyCommand ./build.sh runi go run main.go client pipe lhproxy http://localhost:8080/ %h:%p" localhost whoami
-  echo SUCCESS
 }
 
 cd "$(dirname "$0")"; _cmd="${1?"cmd is required"}"; shift; "cmd_${_cmd}" "$@"
