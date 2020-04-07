@@ -1,1 +1,49 @@
 language: minimal
+
+services:
+  - docker
+
+before_install:
+  - ./ci/ci.sh detect_version
+
+script:
+  - export LHPROXY_VERSION="$(cat build/version.txt)"
+  - ./ci/ci.sh build
+  - ./ci/ci.sh fmt
+  - export GITHUB_NAME="$LHPROXY_VERSION"
+  - export GITHUB_TAG_NAME="$LHPROXY_VERSION"
+
+deploy:
+  - provider: releases
+    overwrite: true
+    draft: false
+    prerelease: true
+    file: build/pack/*
+    edge: true
+    on:
+      tags: true
+      condition: $TRAVIS_TAG == edge
+
+  - provider: releases
+    overwrite: false
+    draft: false
+    prerelease: false
+    file: build/pack/*
+    edge: true
+    on:
+      tags: true
+      condition: $TRAVIS_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+$
+
+  - provider: script
+    edge: true
+    script: ./ci/ci.sh deploy_docker latest
+    on:
+      tags: true
+      condition: $TRAVIS_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+$
+
+  - provider: script
+    script: ./ci/ci.sh deploy_docker
+    edge: true
+    on:
+      tags: true
+      condition: $TRAVIS_TAG == edge
