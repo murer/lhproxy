@@ -37,17 +37,25 @@ func DescError(err error) int {
 type connWrapper struct {
 	id       string
 	conn     *net.TCPConn
-	lastUsed int64
+	lastUsed time.Time
 }
 
 func (c *connWrapper) Close() {
 	c.conn.Close()
 }
 
+func (c *connWrapper) GetLastUsed() time.Time {
+	return c.lastUsed
+}
+
 type listenerWrapper struct {
 	id       string
 	ln       net.Listener
-	lastUsed int64
+	lastUsed time.Time
+}
+
+func (c *listenerWrapper) GetLastUsed() time.Time {
+	return c.lastUsed
 }
 
 func (l *listenerWrapper) Close() {
@@ -68,7 +76,7 @@ func (l *listenerWrapper) accept(timeout time.Duration) (*connWrapper, bool) {
 	c := &connWrapper{
 		id:       fmt.Sprintf("conn://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String()),
 		conn:     conn.(*net.TCPConn),
-		lastUsed: time.Now().Unix(),
+		lastUsed: time.Now(),
 	}
 	return c, false
 }
@@ -80,12 +88,7 @@ type NativeSockets struct {
 	ReadTimeout time.Duration
 	AcceptTimeout time.Duration
 	SocketIdleTimeout time.Duration
-}
-
-var native = &NativeSockets{
-	ReadTimeout: 30 * time.Second,
-	AcceptTimeout: 30 * time.Second,
-	SocketIdleTimeout: 5 * time.Minute,
+	AcceptIdleTimeout time.Duration
 }
 
 func (scks *NativeSockets) Listen(addr string) string {
@@ -94,16 +97,17 @@ func (scks *NativeSockets) Listen(addr string) string {
 	l := &listenerWrapper{
 		ln:       ln,
 		id:       fmt.Sprintf("listen://%s", ln.Addr().String()),
-		lastUsed: time.Now().Unix(),
+		lastUsed: time.Now(),
 	}
 	lns[l.id] = l
+	go scks.idleControl(l.id)
 	log.Printf("[%s] Listening", l.id)
 	return l.id
 }
 
 func (scks *NativeSockets) Accept(name string) string {
 	l := lns[name]
-	l.lastUsed = time.Now().Unix()
+	l.lastUsed = time.Now()
 	log.Printf("[%s] Accepting", l.id)
 	conn, closed := l.accept(scks.AcceptTimeout)
 	if closed {
@@ -115,6 +119,7 @@ func (scks *NativeSockets) Accept(name string) string {
 		return ""
 	}
 	conns[conn.id] = conn
+	go scks.idleControl(conn.id)
 	log.Printf("[%s] Accepted", conn.id)
 	return conn.id
 }
@@ -125,9 +130,10 @@ func (scks *NativeSockets) Connect(addr string) string {
 	c := &connWrapper{
 		id:       fmt.Sprintf("conn://%s:%s", conn.RemoteAddr().String(), conn.LocalAddr().String()),
 		conn:     conn.(*net.TCPConn),
-		lastUsed: time.Now().Unix(),
+		lastUsed: time.Now(),
 	}
 	conns[c.id] = c
+	go scks.idleControl(c.id)
 	log.Printf("[%s] Connected", c.id)
 	return c.id
 }
@@ -173,14 +179,14 @@ func (scks *NativeSockets) Read(id string, max int) []byte {
 		util.Check(err)
 	}
 	buf = buf[:n]
-	c.lastUsed = time.Now().Unix()
+	c.lastUsed = time.Now()
 	log.Printf("[%s] Read: %d", c.id, len(buf))
 	return buf
 }
 
 func (scks *NativeSockets) Write(id string, data []byte, close int) {
 	c := conns[id]
-	c.lastUsed = time.Now().Unix()
+	c.lastUsed = time.Now()
 	log.Printf("[]%s] Write: %d", c.id, len(data))
 	if len(data) > 0 {
 		n, err := c.conn.Write(data)
@@ -190,8 +196,4 @@ func (scks *NativeSockets) Write(id string, data []byte, close int) {
 		}
 	}
 	scks.Close(id, close)
-}
-
-func GetNative() Sockets {
-	return native
 }

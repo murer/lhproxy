@@ -65,6 +65,7 @@ func GetNative() sockets.Sockets {
 		ReadTimeout: 1 * time.Millisecond,
 		AcceptTimeout: 1 * time.Millisecond,
 		SocketIdleTimeout: 200 * time.Millisecond,
+		AcceptIdleTimeout: 600 * time.Millisecond,
 	}
 }
 
@@ -87,10 +88,18 @@ func TestIdle(t *testing.T) {
 	assert.Equal(t, []byte{5, 6}, scks.Read(cs, 2))
 
 	time.Sleep(400 * time.Millisecond)
-	// scks.Close(cs, sockets.CLOSE_SCK)
 
 	assert.Panics(t, func() {
-		scks.Read(cs, 2)
+		assert.Equal(t, []byte{7}, scks.Read(cs, 2))
 	})
 
+	assert.Panics(t, func() {
+		scks.Read(cc, 2)
+	})
+
+	time.Sleep(400 * time.Millisecond)
+	assert.Panics(t, func() {
+		cs2 := scks.Accept(listen)
+		defer scks.Close(cs2, sockets.CLOSE_SCK)
+	})
 }
