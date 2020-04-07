@@ -77,13 +77,15 @@ var lns = make(map[string]*listenerWrapper)
 var conns = make(map[string]*connWrapper)
 
 type NativeSockets struct {
-	ReadTimeout   time.Duration
+	ReadTimeout time.Duration
 	AcceptTimeout time.Duration
+	SocketIdleTimeout time.Duration
 }
 
 var native = &NativeSockets{
-	ReadTimeout:   30 * time.Second,
+	ReadTimeout: 30 * time.Second,
 	AcceptTimeout: 30 * time.Second,
+	SocketIdleTimeout: 5 * time.Minute,
 }
 
 func (scks *NativeSockets) Listen(addr string) string {
