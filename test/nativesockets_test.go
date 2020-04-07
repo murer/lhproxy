@@ -69,10 +69,10 @@ func GetNative() sockets.Sockets {
 	}
 }
 
-// func TestNativeSockets(t *testing.T) {
-// 	native := GetNative()
-// 	SocksTest(t, native)
-// }
+func TestNativeSockets(t *testing.T) {
+	native := GetNative()
+	SocksTest(t, native)
+}
 
 func TestIdle(t *testing.T) {
 	scks := &sockets.NativeSockets{
