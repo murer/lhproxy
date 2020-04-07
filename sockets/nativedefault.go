@@ -4,13 +4,15 @@ import (
 	"time"
 )
 
-var native = &NativeSockets{
-	ReadTimeout:       30 * time.Second,
-	AcceptTimeout:     30 * time.Second,
-	SocketIdleTimeout: 5 * time.Minute,
-	ListenIdleTimeout: 0 * time.Minute,
-}
+var native *NativeSockets = nil
 
 func GetNative() Sockets {
+	if native == nil {
+		log.Printf("Creating defaut NativeSockets")
+		native = &NativeSockets{
+			ReadTimeout:       30 * time.Second,
+			AcceptTimeout:     30 * time.Second,
+		}
+	}
 	return native
 }
