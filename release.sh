@@ -17,4 +17,10 @@ cmd_force() {
   git push origin "$lhproxy_version" -f
 }
 
+cmd_DeLeTe_TaG() {
+  lhproxy_version="${1?'version, like: x.x.x'}"
+  git tag -d "$lhproxy_version"
+  git push --delete origin "$lhproxy_version"
+}
+
 cd "$(dirname "$0")"; _cmd="${1?"cmd is required"}"; shift; "cmd_${_cmd}" "$@"
