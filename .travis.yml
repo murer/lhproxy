@@ -13,7 +13,7 @@ script:
   - export GITHUB_NAME="$LHPROXY_VERSION"
   - export GITHUB_TAG_NAME="$LHPROXY_VERSION"
 
-# deploy:
+deploy:
   # - provider: releases
   #   overwrite: true
   #   draft: false
@@ -37,14 +37,14 @@ script:
 
 # script: ./ci/ci.sh deploy_docker
 
-  # - provider: script
-  #   script:
-  #     - echo "$TRAVIS_TAG"
-  #     - echo bbb
-  #   edge: true
-  #   on:
-  #     tags: true
-  #    condition: $TRAVIS_TAG =~ ^[0-9]\+\.[0-9]\+\.[0-9]\+$
+  - provider: script
+    script:
+      - echo "$TRAVIS_TAG"
+      - echo bbb
+    edge: true
+    on:
+      tags: true
+      condition: $TRAVIS_TAG =~ ^[0-9]\+\.[0-9]\+\.[0-9]\+$
   #
   # - provider: script
   #   script:
