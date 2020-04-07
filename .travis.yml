@@ -5,6 +5,7 @@ services:
 
 before_install:
   - ./ci/ci.sh detect_version
+  - ./docker.sh init
 
 script:
   - export LHPROXY_VERSION="$(cat build/version.txt)"

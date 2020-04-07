@@ -2,6 +2,10 @@
 
 LHPROXY_USER_ID="$(id -u):$(id -g)"
 
+cmd_init() {
+  docker network create --label lhproxy_dev --driver bridge lhproxy-dev-network
+}
+
 cmd_build() {
   docker build -t lhproxy/lhproxy:dev .
 }
@@ -20,9 +24,9 @@ docker_lhproxy() {
 docker_golang() {
   docker volume create lhproxy_golang_dev --label lhproxy_dev || true
   docker run $LHPROXY_DOCKER_EXTRA --rm --label lhproxy_dev \
+    --network lhproxy-dev-network \
     --mount source=lhproxy_golang_dev,target=/go \
     -v "$(pwd)":/go/src -w /go/src \
-    --network host \
     -e "LHPROXY_SECRET=123" \
     -e "HOME=/go" \
     -u "$LHPROXY_USER_ID" \
