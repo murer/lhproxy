@@ -87,8 +87,6 @@ var conns = make(map[string]*connWrapper)
 type NativeSockets struct {
 	ReadTimeout       time.Duration
 	AcceptTimeout     time.Duration
-	SocketIdleTimeout time.Duration
-	ListenIdleTimeout time.Duration
 }
 
 func (scks *NativeSockets) Listen(addr string) string {
