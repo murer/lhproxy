@@ -37,7 +37,9 @@ func TestSelf(t *testing.T) {
 	util.Check(err)
 	defer resp.Body.Close()
 	assert.Equal(t, 200, resp.StatusCode)
-	content, err := base64.StdEncoding.DecodeString(util.ReadAllString(resp.Body))
+	body := util.ReadAll(resp.Body)
+	content, err := base64.StdEncoding.DecodeString(string(body))
 	util.Check(err)
 	assert.Equal(t, util.SHA256(localData), util.SHA256(content))
+	assert.Equal(t, resp.Header["X-Sec"][0], util.SHA256Hex(append(body, util.Secret()...)))
 }

@@ -26,10 +26,10 @@ func handleSelf(w http.ResponseWriter, r *http.Request) {
 		localData = []byte(base64.StdEncoding.EncodeToString(localData))
 		w.Header().Set("Content-Length", strconv.Itoa(len(localData)))
 		w.Header().Set("Content-Type", "text/plain")
-		w.Write(localData)
 	} else {
 		w.Header().Set("Content-Length", strconv.Itoa(len(localData)))
 		w.Header().Set("Content-Type", "application/octet-stream")
-		w.Write(localData)
 	}
+	w.Header().Set("X-Sec", util.SHA256Hex(append(localData, util.Secret()...)))
+	w.Write(localData)
 }
