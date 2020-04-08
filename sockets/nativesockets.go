@@ -81,12 +81,20 @@ func (l *listenerWrapper) accept(timeout time.Duration) (*connWrapper, bool) {
 	return c, false
 }
 
-var lns = make(map[string]*listenerWrapper)
-var conns = make(map[string]*connWrapper)
+// var lns = make(map[string]*listenerWrapper)
+// var conns = make(map[string]*connWrapper)
 
 type NativeSockets struct {
-	ReadTimeout   time.Duration
+	ReadTimeout time.Duration
 	AcceptTimeout time.Duration
+
+	lns map[string]*listenerWrapper
+	conns map[string]*connWrapper
+}
+
+func (scks *NativeSockets) Prepare() {
+	scks.lns = map[string]*listenerWrapper{}
+	scks.conns = map[string]*connWrapper{}
 }
 
 func (scks *NativeSockets) Listen(addr string) string {
@@ -97,13 +105,13 @@ func (scks *NativeSockets) Listen(addr string) string {
 		id:       fmt.Sprintf("listen://%s", ln.Addr().String()),
 		lastUsed: time.Now(),
 	}
-	lns[l.id] = l
+	scks.lns[l.id] = l
 	log.Printf("[%s] Listening", l.id)
 	return l.id
 }
 
 func (scks *NativeSockets) Accept(name string) string {
-	l := lns[name]
+	l := scks.lns[name]
 	l.lastUsed = time.Now()
 	log.Printf("[%s] Accepting", l.id)
 	conn, closed := l.accept(scks.AcceptTimeout)
@@ -115,7 +123,7 @@ func (scks *NativeSockets) Accept(name string) string {
 		log.Printf("[%s] No connection accepted", l.id)
 		return ""
 	}
-	conns[conn.id] = conn
+	scks.conns[conn.id] = conn
 	log.Printf("[%s] Accepted", conn.id)
 	return conn.id
 }
@@ -128,21 +136,21 @@ func (scks *NativeSockets) Connect(addr string) string {
 		conn:     conn.(*net.TCPConn),
 		lastUsed: time.Now(),
 	}
-	conns[c.id] = c
+	scks.conns[c.id] = c
 	log.Printf("[%s] Connected", c.id)
 	return c.id
 }
 
 func (scks *NativeSockets) Close(id string, resources int) {
-	l := lns[id]
+	l := scks.lns[id]
 	if l != nil {
 		if resources == CLOSE_SCK {
 			log.Printf("[%s] Closing listen", l.id)
-			delete(lns, l.id)
+			delete(scks.lns, l.id)
 			l.Close()
 		}
 	}
-	c := conns[id]
+	c := scks.conns[id]
 	if c != nil {
 		if resources == CLOSE_IN {
 			log.Printf("[%s] Closing conn reader", c.id)
@@ -154,14 +162,14 @@ func (scks *NativeSockets) Close(id string, resources int) {
 		}
 		if resources == CLOSE_SCK {
 			log.Printf("[%s] Closing conn socket", c.id)
-			delete(conns, c.id)
+			delete(scks.conns, c.id)
 			c.Close()
 		}
 	}
 }
 
 func (scks *NativeSockets) Read(id string, max int) []byte {
-	c := conns[id]
+	c := scks.conns[id]
 	buf := make([]byte, max)
 	c.conn.SetReadDeadline(time.Now().Add(scks.ReadTimeout))
 	n, err := c.conn.Read(buf)
@@ -180,7 +188,7 @@ func (scks *NativeSockets) Read(id string, max int) []byte {
 }
 
 func (scks *NativeSockets) Write(id string, data []byte, close int) {
-	c := conns[id]
+	c := scks.conns[id]
 	c.lastUsed = time.Now()
 	log.Printf("[]%s] Write: %d", c.id, len(data))
 	if len(data) > 0 {

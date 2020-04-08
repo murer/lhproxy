@@ -27,10 +27,10 @@ func (scks *NativeSockets) closeIfIdle(name string, lastModified time.Time, time
 }
 
 func (scks *NativeSockets) idleCheck(socketTimeout time.Duration, listenTimeout time.Duration) {
-	for _, conn := range conns {
+	for _, conn := range scks.conns {
 		scks.closeIfIdle(conn.id, conn.lastUsed, socketTimeout)
 	}
-	for _, conn := range lns {
+	for _, conn := range scks.lns {
 		scks.closeIfIdle(conn.id, conn.lastUsed, listenTimeout)
 	}
 }

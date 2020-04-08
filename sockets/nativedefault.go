@@ -12,6 +12,7 @@ func GetNative() Sockets {
 			ReadTimeout:   30 * time.Second,
 			AcceptTimeout: 30 * time.Second,
 		}
+		ret.Prepare()
 		go ret.IdleStart(5*time.Minute, 0*time.Minute)
 		native = ret
 	}

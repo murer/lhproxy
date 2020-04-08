@@ -14,6 +14,7 @@ func TestPipe(t *testing.T) {
 		ReadTimeout:   3000 * time.Millisecond,
 		AcceptTimeout: 3000 * time.Millisecond,
 	}
+	scks.Prepare()
 	lr, lw := io.Pipe()
 	defer lw.Close()
 	defer lr.Close()
