@@ -26,5 +26,5 @@ COPY entrypoint /root/entrypoint
 RUN chmod +x /root/entrypoint/*.sh
 
 FROM base AS final
-COPY --from=lhproxy/lhproxy:dev /lhproxy/lhproxy /usr/local/bin
+COPY --from=lhproxy/lhproxy:dev /usr/local/bin/lhproxy /usr/local/bin
 #COPY build/out/linux-amd64/lhproxy/lhproxy /usr/local/bin
