@@ -1,15 +1,15 @@
 package server
 
 import (
+	"encoding/base64"
+	"fmt"
+	"github.com/murer/lhproxy/util"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
-	"io/ioutil"
-	"fmt"
 	"strconv"
-	"encoding/base64"
 	"strings"
-	"github.com/murer/lhproxy/util"
 )
 
 func handleSelf(w http.ResponseWriter, r *http.Request) {

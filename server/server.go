@@ -5,8 +5,8 @@ import (
 	"github.com/murer/lhproxy/util"
 	"io/ioutil"
 	"log"
-	"strings"
 	"net/http"
+	"strings"
 )
 
 var scks sockets.Sockets

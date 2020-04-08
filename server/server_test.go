@@ -1,12 +1,12 @@
 package server
 
 import (
+	"encoding/base64"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"testing"
 	"os"
-	"io/ioutil"
-	"encoding/base64"
+	"testing"
 
 	"github.com/stretchr/testify/assert"
 

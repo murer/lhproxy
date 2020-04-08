@@ -73,9 +73,9 @@ func configCrypt() {
 	rootCmd.AddCommand(cryptCmd)
 
 	cryptCmd.AddCommand(&cobra.Command{
-		Use:  "enc",
+		Use: "enc",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			c := util.Cryptor{Secret:util.Secret()}
+			c := util.Cryptor{Secret: util.Secret()}
 			data := util.ReadAll(os.Stdin)
 			os.Stdout.Write(c.Encrypt(data))
 			return nil
@@ -83,9 +83,9 @@ func configCrypt() {
 	})
 
 	cryptCmd.AddCommand(&cobra.Command{
-		Use:  "dec",
+		Use: "dec",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			c := util.Cryptor{Secret:util.Secret()}
+			c := util.Cryptor{Secret: util.Secret()}
 			data := util.ReadAll(os.Stdin)
 			os.Stdout.Write(c.Decrypt(data))
 			return nil
