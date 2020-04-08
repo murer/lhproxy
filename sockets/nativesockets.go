@@ -7,6 +7,7 @@ import (
 	"net"
 	"strings"
 	"time"
+	"sync"
 
 	"github.com/murer/lhproxy/util"
 )
@@ -93,8 +94,8 @@ type NativeSockets struct {
 }
 
 func (scks *NativeSockets) Prepare() {
-	scks.lns = map[string]*listenerWrapper{}
-	scks.conns = map[string]*connWrapper{}
+	scks.lns = sync.Map{}
+	scks.conns = sync.Map{}
 }
 
 func (scks *NativeSockets) Listen(addr string) string {
