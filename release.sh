@@ -3,8 +3,8 @@
 cmd_version() {
   lhproxy_version="${1?'version, like: x.x.x'}"
   echo "$lhproxy_version" | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+$"
-  echo git tag "$lhproxy_version"
-  echo git push origin "$lhproxy_version"
+  git tag "$lhproxy_version"
+  git push origin "$lhproxy_version"
 }
 
 cmd_edge() {
