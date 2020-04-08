@@ -23,8 +23,9 @@ RUN echo "coredump_dir /var/cache/squid" >> /etc/squid/squid.conf
 
 RUN dd if=/dev/random count=1 bs=12 | base64 > /root/secret.txt
 
-COPY it/entrypoint /root/entrypoint
+COPY entrypoint /root/entrypoint
 RUN chmod +x /root/entrypoint/*.sh
 
 FROM base AS final
-COPY build/out/linux-amd64/lhproxy/lhproxy /usr/local/bin
+COPY --from=lhproxy/lhproxy:dev /lhproxy/lhproxy /usr/local/bin
+#COPY build/out/linux-amd64/lhproxy/lhproxy /usr/local/bin

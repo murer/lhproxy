@@ -14,9 +14,10 @@ cmd_build() {
   ./it/it.sh build base 1> /dev/null 2>&1 &
   ./docker.sh runi golang ./build.sh test .
   ./docker.sh runi golang ./build.sh build_all "$LHPROXY_VERSION"
+   ./docker.sh build
    wait %1
   ./it/it.sh it
-  ./docker.sh build
+
   [[ -z "$(git status --porcelain)" ]]
 }
 

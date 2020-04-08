@@ -12,9 +12,10 @@ cmd_build() {
   cd -
 }
 
-cmd_test() {
+cmd_run() {
   trap cmd_cleanup EXIT
   cmd_cleanup
+  cmd_build
   docker run -d --rm --label lhproxy_dev --name lhproxy_it_squid \
     -p 3128:3128 -h lhproxy_it_squid lhproxy/it:dev /root/entrypoint/server.sh
 
@@ -22,11 +23,6 @@ cmd_test() {
     --network host lhproxy/it:dev /root/entrypoint/pipe.sh
 
   echo "SUCCESS"
-}
-
-cmd_it() {
-  cmd_build
-  cmd_test
 }
 
 cd "$(dirname "$0")"; _cmd="${1?"cmd is required"}"; shift; "cmd_${_cmd}" "$@"
