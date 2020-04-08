@@ -11,14 +11,15 @@ cmd_build() {
 }
 
 cmd_run() {
-  trap cmd_cleanup EXIT
+  # trap cmd_cleanup EXIT
   cmd_cleanup
   cmd_build
-  docker run -d --rm --label lhproxy_dev --name lhproxy_it_squid \
-    -p 3128:3128 -h lhproxy_it_squid lhproxy/it:dev /root/entrypoint/server.sh
-
+  docker run -dit --rm --label lhproxy_dev --name lhproxy_it_squid \
+    --network lhproxy-dev-network \
+    lhproxy/it:dev /root/entrypoint/server.sh
   docker run -it --rm --label lhproxy_dev --name lhproxy_it_pipe \
-    --network host lhproxy/it:dev /root/entrypoint/pipe.sh
+    --network lhproxy-dev-network \
+    lhproxy/it:dev /root/entrypoint/pipe.sh
 
   echo "SUCCESS"
 }
