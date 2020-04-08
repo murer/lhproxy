@@ -1,4 +1,4 @@
-#!/bin/bash -xe
+#!/bin/bash -e
 
 LHPROXY_USER_ID="$(id -u):$(id -g)"
 

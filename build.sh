@@ -1,4 +1,4 @@
-#!/bin/bash -xe
+#!/bin/bash -e
 
 find_dirs_by_file() {
   find "${1?'base dir for find, use . for all'}" -name "${2?'pattern, like: *.go'}" | \
