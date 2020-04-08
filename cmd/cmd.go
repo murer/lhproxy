@@ -5,10 +5,10 @@ import (
 	"github.com/spf13/cobra"
 	"io/ioutil"
 	"log"
-	"os"
-	"runtime"
 	"net/http"
 	"net/url"
+	"os"
+	"runtime"
 
 	"github.com/murer/lhproxy/pipe"
 	"github.com/murer/lhproxy/server"
