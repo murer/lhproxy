@@ -7,7 +7,7 @@ import (
 	"net"
 	"strings"
 	"time"
-
+	"sync"
 	"github.com/murer/lhproxy/util"
 )
 
@@ -81,20 +81,43 @@ func (l *listenerWrapper) accept(timeout time.Duration) (*connWrapper, bool) {
 	return c, false
 }
 
-// var lns = make(map[string]*listenerWrapper)
-// var conns = make(map[string]*connWrapper)
-
 type NativeSockets struct {
 	ReadTimeout time.Duration
 	AcceptTimeout time.Duration
 
+	lnsMutex sync.Mutex
 	lns map[string]*listenerWrapper
+	connsMutex sync.Mutex
 	conns map[string]*connWrapper
 }
 
 func (scks *NativeSockets) Prepare() {
 	scks.lns = map[string]*listenerWrapper{}
 	scks.conns = map[string]*connWrapper{}
+}
+
+func (scks *NativeSockets) LnPut(name string, conn *listenerWrapper) {
+	scks.lnsMutex.Lock()
+	defer scks.lnsMutex.Unlock()
+	scks.lns[name] = conn
+}
+
+func (scks *NativeSockets) LnDelete(name string) {
+	scks.lnsMutex.Lock()
+	defer scks.lnsMutex.Unlock()
+	delete(scks.lns, name)
+}
+
+func (scks *NativeSockets) ConnPut(name string, conn *connWrapper) {
+	scks.conns[name] = conn
+	scks.connsMutex.Lock()
+	defer scks.connsMutex.Unlock()
+}
+
+func (scks *NativeSockets) ConnDelete(name string) {
+	scks.connsMutex.Lock()
+	defer scks.connsMutex.Unlock()
+	delete(scks.conns, name)
 }
 
 func (scks *NativeSockets) Listen(addr string) string {
@@ -105,7 +128,7 @@ func (scks *NativeSockets) Listen(addr string) string {
 		id:       fmt.Sprintf("listen://%s", ln.Addr().String()),
 		lastUsed: time.Now(),
 	}
-	scks.lns[l.id] = l
+	scks.LnPut(l.id, l)
 	log.Printf("[%s] Listening", l.id)
 	return l.id
 }
@@ -123,7 +146,7 @@ func (scks *NativeSockets) Accept(name string) string {
 		log.Printf("[%s] No connection accepted", l.id)
 		return ""
 	}
-	scks.conns[conn.id] = conn
+	scks.ConnPut(conn.id, conn)
 	log.Printf("[%s] Accepted", conn.id)
 	return conn.id
 }
@@ -136,7 +159,7 @@ func (scks *NativeSockets) Connect(addr string) string {
 		conn:     conn.(*net.TCPConn),
 		lastUsed: time.Now(),
 	}
-	scks.conns[c.id] = c
+	scks.ConnPut(c.id, c)
 	log.Printf("[%s] Connected", c.id)
 	return c.id
 }
@@ -146,7 +169,7 @@ func (scks *NativeSockets) Close(id string, resources int) {
 	if l != nil {
 		if resources == CLOSE_SCK {
 			log.Printf("[%s] Closing listen", l.id)
-			delete(scks.lns, l.id)
+			scks.LnDelete(l.id)
 			l.Close()
 		}
 	}
@@ -162,7 +185,7 @@ func (scks *NativeSockets) Close(id string, resources int) {
 		}
 		if resources == CLOSE_SCK {
 			log.Printf("[%s] Closing conn socket", c.id)
-			delete(scks.conns, c.id)
+			scks.ConnDelete(c.id)
 			c.Close()
 		}
 	}
