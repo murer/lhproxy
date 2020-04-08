@@ -47,6 +47,9 @@ func Config() {
 	clientCmd.AddCommand(pipeCmd)
 
 	configPipe()
+
+	configCrypt()
+
 }
 
 func gconf() {
@@ -63,6 +66,31 @@ func gconf() {
 		util.Check(err)
 		http.DefaultTransport = &http.Transport{Proxy: http.ProxyURL(proxyUrl)}
 	}
+}
+
+func configCrypt() {
+	cryptCmd := &cobra.Command{Use: "crypt"}
+	rootCmd.AddCommand(cryptCmd)
+
+	cryptCmd.AddCommand(&cobra.Command{
+		Use:  "enc",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			c := util.Cryptor{Secret:util.Secret()}
+			data := util.ReadAll(os.Stdin)
+			os.Stdout.Write(c.Encrypt(data))
+			return nil
+		},
+	})
+
+	cryptCmd.AddCommand(&cobra.Command{
+		Use:  "dec",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			c := util.Cryptor{Secret:util.Secret()}
+			data := util.ReadAll(os.Stdin)
+			os.Stdout.Write(c.Decrypt(data))
+			return nil
+		},
+	})
 }
 
 func configServer() {

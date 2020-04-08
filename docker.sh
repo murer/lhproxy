@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -xe
 
 LHPROXY_USER_ID="$(id -u):$(id -g)"
 
@@ -25,7 +25,7 @@ docker_lhproxy() {
 }
 
 docker_golang() {
-  docker volume create lhproxy_golang_dev --label lhproxy_dev || true
+  docker volume create lhproxy_golang_dev --label lhproxy_dev 1>&2 || true
   docker run $LHPROXY_DOCKER_EXTRA --rm --label lhproxy_dev \
     --network lhproxy-dev-network \
     --mount source=lhproxy_golang_dev,target=/go \
