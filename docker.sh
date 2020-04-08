@@ -7,7 +7,8 @@ cmd_init() {
 }
 
 cmd_build() {
-  docker build -t lhproxy/lhproxy:dev .
+  docker build --target lhproxy_scratch -t lhproxy/lhproxy:dev .
+  docker build --target lhproxy_alpine -t lhproxy/lhproxy:dev-alpine .
 }
 
 cmd_push() {
