@@ -6,6 +6,7 @@ import (
 	"testing"
 	"os"
 	"io/ioutil"
+	"encoding/base64"
 
 	"github.com/stretchr/testify/assert"
 
@@ -32,9 +33,11 @@ func TestSelf(t *testing.T) {
 	localData, err := ioutil.ReadFile(path)
 	util.Check(err)
 
-	resp, err := http.Get(server.URL + "/self/lhproxy")
+	resp, err := http.Get(server.URL + "/self/lhproxy.txt")
 	util.Check(err)
 	defer resp.Body.Close()
 	assert.Equal(t, 200, resp.StatusCode)
-	assert.Equal(t, util.SHA256(localData), util.SHA256(util.ReadAll(resp.Body)))
+	content, err := base64.StdEncoding.DecodeString(util.ReadAllString(resp.Body))
+	util.Check(err)
+	assert.Equal(t, util.SHA256(localData), util.SHA256(content))
 }
