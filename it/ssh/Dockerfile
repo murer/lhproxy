@@ -19,7 +19,6 @@ RUN ssh-keygen -A && \
   echo "http_access allow all" >> /etc/squid/squid.conf && \
   echo "http_port 3128" >> /etc/squid/squid.conf && \
   echo "coredump_dir /var/cache/squid" >> /etc/squid/squid.conf && \
-  echo "	hosts_file /etc/hosts" >> /etc/squid/squid.conf && \
   dd if=/dev/random count=1 bs=12 | base64 > /root/secret.txt
 
 COPY entrypoint /root/entrypoint
