@@ -11,7 +11,7 @@ cmd_build() {
 }
 
 cmd_run() {
-  # trap cmd_cleanup EXIT
+  trap cmd_cleanup EXIT
   cmd_cleanup
   cmd_build
   docker run -dit --rm --label lhproxy_dev --name lhproxy_it_squid \

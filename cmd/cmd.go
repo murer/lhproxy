@@ -7,6 +7,8 @@ import (
 	"log"
 	"os"
 	"runtime"
+	"net/http"
+	"net/url"
 
 	"github.com/murer/lhproxy/pipe"
 	"github.com/murer/lhproxy/server"
@@ -25,6 +27,7 @@ func Config() {
 		Version: fmt.Sprintf("%s-%s:%s", runtime.GOOS, runtime.GOARCH, util.Version),
 	}
 	rootCmd.PersistentFlags().BoolP("quiet", "q", false, "Quiet")
+	rootCmd.PersistentFlags().StringP("proxy", "p", "", "Proxy")
 	cobra.OnInitialize(gconf)
 
 	rootCmd.AddCommand(&cobra.Command{
@@ -51,6 +54,14 @@ func gconf() {
 	util.Check(err)
 	if quiet {
 		log.SetOutput(ioutil.Discard)
+	}
+	proxy, err := rootCmd.PersistentFlags().GetString("proxy")
+	util.Check(err)
+	if proxy != "" {
+		log.Printf("Proxy: %s", proxy)
+		proxyUrl, err := url.Parse(proxy)
+		util.Check(err)
+		http.DefaultTransport = &http.Transport{Proxy: http.ProxyURL(proxyUrl)}
 	}
 }
 
