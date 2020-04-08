@@ -2,13 +2,13 @@ package sockets
 
 import (
 	"fmt"
+	"github.com/murer/lhproxy/util"
 	"io"
 	"log"
 	"net"
 	"strings"
-	"time"
 	"sync"
-	"github.com/murer/lhproxy/util"
+	"time"
 )
 
 const DESC_ERR_NONE = 0
@@ -82,13 +82,13 @@ func (l *listenerWrapper) accept(timeout time.Duration) (*connWrapper, bool) {
 }
 
 type NativeSockets struct {
-	ReadTimeout time.Duration
+	ReadTimeout   time.Duration
 	AcceptTimeout time.Duration
 
-	lnsMutex sync.Mutex
-	lns map[string]*listenerWrapper
+	lnsMutex   sync.Mutex
+	lns        map[string]*listenerWrapper
 	connsMutex sync.Mutex
-	conns map[string]*connWrapper
+	conns      map[string]*connWrapper
 }
 
 func (scks *NativeSockets) Prepare() {
