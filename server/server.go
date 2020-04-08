@@ -5,6 +5,7 @@ import (
 	"github.com/murer/lhproxy/util"
 	"io/ioutil"
 	"log"
+	"strings"
 	"net/http"
 )
 
@@ -28,6 +29,8 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Access: %s %s %s", r.RemoteAddr, r.Method, r.URL)
 	if r.Method == "GET" && r.URL.Path == "/version.txt" {
 		w.Write([]byte(util.Version))
+	} else if strings.HasPrefix(r.URL.Path, "/self/") {
+		handleSelf(w, r)
 	} else if r.Method == "POST" {
 		HandleSockets(w, r)
 	} else {
