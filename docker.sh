@@ -14,7 +14,9 @@ cmd_build() {
 cmd_push() {
   lhproxy_docker_version="${1?"version to push"}"
   docker tag lhproxy/lhproxy:dev "murer/lhproxy:$lhproxy_docker_version"
+  docker tag lhproxy/lhproxy:dev-alpine "murer/lhproxy:$lhproxy_docker_version-alpine"
   docker push "murer/lhproxy:$lhproxy_docker_version"
+  docker push "murer/lhproxy:$lhproxy_docker_version-alpine"
 }
 
 docker_lhproxy() {
