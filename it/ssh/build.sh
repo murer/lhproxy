@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -xe
 
 cmd_cleanup() {
   docker rm -f lhproxy_it_squid || true
