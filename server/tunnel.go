@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-const MSG_MAX = 20
+const MSG_MAX = 100
 
 type reply struct {
 	req *Message
