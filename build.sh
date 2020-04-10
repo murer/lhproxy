@@ -1,8 +1,9 @@
 #!/bin/bash -e
 
-find_dirs_by_file() {
+cmd_listdirs() {
   find "${1?'base dir for find, use . for all'}" -name "${2?'pattern, like: *.go'}" | \
-    grep -v "\.git" | while read k; do dirname "$k"; done | sort | uniq
+    grep -v "\.git" | grep -v 'vendor/' | \
+    while read k; do dirname "$k"; done | sort | uniq
 }
 
 cmd_clean() {
@@ -12,7 +13,7 @@ cmd_clean() {
 cmd_test() {
   findbase="${1?"path is required, may be ."}"
   shift
-  find_dirs_by_file "$findbase" '*_test.go' | xargs go test "$@"
+  cmd_listdirs "$findbase" '*_test.go' | xargs go test "$@"
 }
 
 cmd_vendor() {
@@ -20,7 +21,7 @@ cmd_vendor() {
 }
 
 cmd_fmt() {
-  find_dirs_by_file "." '*.go' | while read k; do go fmt "$k" ; done
+  cmd_listdirs "." '*.go' | while read k; do go fmt "$k" ; done
 }
 
 cmd_build() {
