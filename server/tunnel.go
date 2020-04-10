@@ -7,6 +7,11 @@ import (
 
 const MSG_MAX = 20
 
+type reply struct {
+	req *Message
+	resp *Message
+}
+
 type Tunnel struct {
 	URL string
 	channel chan *Message
@@ -48,7 +53,7 @@ func (me *Tunnel) Request(req *Message) *Message {
 	return rpl.resp
 }
 
-func (me *Tunnel) post() {
+func (me *Tunnel) send() {
 	me.mutex.L.Lock()
 	defer me.mutex.L.Unlock()
 	for len(me.msgs) <= 0 {
@@ -61,7 +66,7 @@ func (me *Tunnel) post() {
 		me.closed = true
 		return
 	}
-	tunnelPost()
+	me.post()
 	for _, rpl := range me.msgs {
 		if rpl == nil {
 			break
@@ -74,7 +79,7 @@ func (me *Tunnel) post() {
 
 func (me *Tunnel) start() {
 	for ! me.closed {
-		me.post()
+		me.send()
 	}
 	log.Printf("Posts stopped")
 }
@@ -92,6 +97,10 @@ func (me *Tunnel) Close() error {
 	}
 	log.Printf("Tunnel closed")
 	return nil
+}
+
+func (me *Tunnel) post() {
+
 }
 
 type Reader struct {}
