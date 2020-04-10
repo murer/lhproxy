@@ -15,4 +15,5 @@ func TestTunnel(t *testing.T) {
 	original := &Message{Name: "echo", Payload: []byte{10}}
 	go tunnel.Post()
 	assert.Equal(t, original, tunnel.Request(original))
+	assert.Equal(t, original, tunnel.Request(original))
 }
