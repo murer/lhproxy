@@ -22,15 +22,20 @@ type Tunnel struct {
 }
 
 func NewTunnel(url string) *Tunnel {
-	return &Tunnel{
+	ret := &Tunnel{
 		URL: url,
 		channel: make(chan *Message, 2),
 		mutex: sync.NewCond(&sync.Mutex{}),
 		msgs: make([]*reply, 0, MSG_MAX),
 	}
+	// go ret.start()
+	return ret
 }
 
 func (me *Tunnel) Request(req *Message) *Message {
+	if req == nil {
+		log.Panicf("You can not request nil message")
+	}
 	log.Printf("Sending: %s", req.Name)
 	me.mutex.L.Lock()
 	defer me.mutex.L.Unlock()
@@ -44,12 +49,13 @@ func (me *Tunnel) Request(req *Message) *Message {
 	idx := len(me.msgs)
 	for rpl.resp == nil {
 		log.Printf("Waiting response: %d", idx)
+		me.mutex.Broadcast()
 		me.mutex.Wait()
 	}
 	return rpl.resp
 }
 
-func (me *Tunnel) Post() {
+func (me *Tunnel) post() {
 	log.Printf("redirecting messages")
 	me.mutex.L.Lock()
 	defer me.mutex.L.Unlock()
@@ -65,9 +71,9 @@ func (me *Tunnel) Post() {
 	me.mutex.Broadcast()
 }
 
-func (me *Tunnel) Start() {
+func (me *Tunnel) start() {
 	for true {
-		me.Post()
+		me.post()
 	}
 }
 
