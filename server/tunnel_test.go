@@ -15,7 +15,6 @@ func TestTunnel(t *testing.T) {
 	tunnel := NewTunnel(server.URL)
 	original := &Message{Name: "echo", Payload: []byte{10}}
 	go func() {
-		time.Sleep(1 * time.Millisecond)
 		tunnel.Post()
 	}()
 	assert.Equal(t, original, tunnel.Request(original))
