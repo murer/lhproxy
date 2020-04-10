@@ -1,13 +1,11 @@
 package server
 
 import (
-	// "net/http"
 	"log"
 	"sync"
-	// "github.com/murer/lhproxy/util"
 )
 
-const MSG_MAX = 2
+const MSG_MAX = 20
 
 type reply struct {
 	req *Message
@@ -19,6 +17,7 @@ type Tunnel struct {
 	channel chan *Message
 	mutex *sync.Cond
 	msgs []*reply
+	closed bool
 }
 
 func NewTunnel(url string) *Tunnel {
@@ -27,8 +26,9 @@ func NewTunnel(url string) *Tunnel {
 		channel: make(chan *Message, 2),
 		mutex: sync.NewCond(&sync.Mutex{}),
 		msgs: make([]*reply, 0, MSG_MAX),
+		closed: false,
 	}
-	// go ret.start()
+	go ret.start()
 	return ret
 }
 
@@ -36,19 +36,17 @@ func (me *Tunnel) Request(req *Message) *Message {
 	if req == nil {
 		log.Panicf("You can not request nil message")
 	}
-	log.Printf("Sending: %s", req.Name)
 	me.mutex.L.Lock()
 	defer me.mutex.L.Unlock()
-	log.Printf("UUU: %d", len(me.msgs))
+	if me.closed {
+		log.Panicf("Tunnel is closed")
+	}
 	for len(me.msgs) >= MSG_MAX {
-		log.Printf("Waiting for slot to request: %d", len(me.msgs))
 		me.mutex.Wait()
 	}
 	rpl:= &reply{req:req}
 	me.msgs = append(me.msgs, rpl)
-	idx := len(me.msgs)
 	for rpl.resp == nil {
-		log.Printf("Waiting response: %d", idx)
 		me.mutex.Broadcast()
 		me.mutex.Wait()
 	}
@@ -56,15 +54,19 @@ func (me *Tunnel) Request(req *Message) *Message {
 }
 
 func (me *Tunnel) post() {
-	log.Printf("redirecting messages")
 	me.mutex.L.Lock()
 	defer me.mutex.L.Unlock()
 	for len(me.msgs) <= 0 {
-		log.Printf("No messages to post")
 		me.mutex.Wait()
 	}
-	for idx, rpl := range me.msgs {
-		log.Printf("Replying %d", idx)
+	// log.Printf("Posting messages: %d", len(me.msgs))
+	for _, rpl := range me.msgs {
+		if rpl == nil {
+			log.Printf("Message nil found, stopping...")
+			me.mutex.Broadcast()
+			me.closed = true
+			return
+		}
 		rpl.resp = rpl.req
 	}
 	me.msgs = me.msgs[:0]
@@ -72,9 +74,25 @@ func (me *Tunnel) post() {
 }
 
 func (me *Tunnel) start() {
-	for true {
+	for ! me.closed {
 		me.post()
 	}
+	log.Printf("Posts stopped")
+}
+
+func (me *Tunnel) Close() error {
+	log.Printf("Closing tunnel")
+	me.mutex.L.Lock()
+	defer me.mutex.L.Unlock()
+		me.msgs = me.msgs[:1]
+	me.msgs[0] = nil
+	for ! me.closed {
+		log.Printf("Waiting for nil message unlock routines")
+		me.mutex.Broadcast()
+		me.mutex.Wait()
+	}
+	log.Printf("Tunnel closed")
+	return nil
 }
 
 type Reader struct {}
