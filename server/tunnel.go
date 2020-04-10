@@ -100,7 +100,11 @@ func (me *Tunnel) Close() error {
 }
 
 func (me *Tunnel) post() {
-
+	pipein, pipeout := io.Pipe()
+	go func() {
+		pipeout.Write([]byte{5, 6})
+	}()
+	http.Post(me.url, "application/octet-stream", pipein)
 }
 
 type Reader struct{}
