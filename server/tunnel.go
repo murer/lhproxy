@@ -60,12 +60,15 @@ func (me *Tunnel) post() {
 		me.mutex.Wait()
 	}
 	// log.Printf("Posting messages: %d", len(me.msgs))
+	if me.msgs[0] == nil {
+		log.Printf("Message nil found, stopping...")
+		me.mutex.Broadcast()
+		me.closed = true
+		return
+	}
 	for _, rpl := range me.msgs {
 		if rpl == nil {
-			log.Printf("Message nil found, stopping...")
-			me.mutex.Broadcast()
-			me.closed = true
-			return
+			break
 		}
 		rpl.resp = rpl.req
 	}
