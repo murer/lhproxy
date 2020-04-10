@@ -15,6 +15,10 @@ cmd_test() {
   find_dirs_by_file "$findbase" '*_test.go' | xargs go test "$@"
 }
 
+cmd_vendor() {
+  go mod vendor -v
+}
+
 cmd_fmt() {
   find_dirs_by_file "." '*.go' | while read k; do go fmt "$k" ; done
 }
