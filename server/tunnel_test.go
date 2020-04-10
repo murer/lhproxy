@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,8 +13,6 @@ func TestTunnel(t *testing.T) {
 	t.Logf("URL: %s", server.URL)
 	tunnel := NewTunnel(server.URL)
 	original := &Message{Name: "echo", Payload: []byte{10}}
-	go func() {
-		tunnel.Post()
-	}()
+	go tunnel.Post()
 	assert.Equal(t, original, tunnel.Request(original))
 }
