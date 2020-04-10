@@ -8,25 +8,25 @@ import (
 const MSG_MAX = 20
 
 type reply struct {
-	req *Message
+	req  *Message
 	resp *Message
 }
 
 type Tunnel struct {
-	URL string
+	URL     string
 	channel chan *Message
-	mutex *sync.Cond
-	msgs []*reply
-	closed bool
+	mutex   *sync.Cond
+	msgs    []*reply
+	closed  bool
 }
 
 func NewTunnel(url string) *Tunnel {
 	ret := &Tunnel{
-		URL: url,
+		URL:     url,
 		channel: make(chan *Message, 2),
-		mutex: sync.NewCond(&sync.Mutex{}),
-		msgs: make([]*reply, 0, MSG_MAX),
-		closed: false,
+		mutex:   sync.NewCond(&sync.Mutex{}),
+		msgs:    make([]*reply, 0, MSG_MAX),
+		closed:  false,
 	}
 	go ret.start()
 	return ret
@@ -44,7 +44,7 @@ func (me *Tunnel) Request(req *Message) *Message {
 	for len(me.msgs) >= MSG_MAX {
 		me.mutex.Wait()
 	}
-	rpl:= &reply{req:req}
+	rpl := &reply{req: req}
 	me.msgs = append(me.msgs, rpl)
 	for rpl.resp == nil {
 		me.mutex.Broadcast()
@@ -78,7 +78,7 @@ func (me *Tunnel) send() {
 }
 
 func (me *Tunnel) start() {
-	for ! me.closed {
+	for !me.closed {
 		me.send()
 	}
 	log.Printf("Posts stopped")
@@ -88,9 +88,9 @@ func (me *Tunnel) Close() error {
 	log.Printf("Closing tunnel")
 	me.mutex.L.Lock()
 	defer me.mutex.L.Unlock()
-		me.msgs = me.msgs[:1]
+	me.msgs = me.msgs[:1]
 	me.msgs[0] = nil
-	for ! me.closed {
+	for !me.closed {
 		log.Printf("Waiting for nil message unlock routines")
 		me.mutex.Broadcast()
 		me.mutex.Wait()
@@ -103,7 +103,7 @@ func (me *Tunnel) post() {
 
 }
 
-type Reader struct {}
+type Reader struct{}
 
 func (me *Reader) Read(buf []byte) (int, error) {
 	return 0, nil

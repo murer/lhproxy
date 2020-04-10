@@ -31,15 +31,14 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(util.Version))
 	} else if strings.HasPrefix(r.URL.Path, "/self/") {
 		handleSelf(w, r)
-	// } else if strings.HasPrefix(r.URL.Path, "/tunnel/") {
-	// 	handleTunnel(w, r)
+		// } else if strings.HasPrefix(r.URL.Path, "/tunnel/") {
+		// 	handleTunnel(w, r)
 	} else if r.Method == "POST" {
 		HandleSockets(w, r)
 	} else {
 		http.NotFound(w, r)
 	}
 }
-
 
 func HandleSockets(w http.ResponseWriter, r *http.Request) {
 	breq, err := ioutil.ReadAll(r.Body)

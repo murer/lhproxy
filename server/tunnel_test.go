@@ -1,11 +1,11 @@
 package server
 
 import (
+	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"sync"
 	"testing"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestTunnel(t *testing.T) {
