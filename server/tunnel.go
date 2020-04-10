@@ -7,11 +7,6 @@ import (
 
 const MSG_MAX = 20
 
-type reply struct {
-	req *Message
-	resp *Message
-}
-
 type Tunnel struct {
 	URL string
 	channel chan *Message
@@ -66,6 +61,7 @@ func (me *Tunnel) post() {
 		me.closed = true
 		return
 	}
+	tunnelPost()
 	for _, rpl := range me.msgs {
 		if rpl == nil {
 			break
