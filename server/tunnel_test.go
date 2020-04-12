@@ -18,7 +18,7 @@ func TestTunnel(t *testing.T) {
 	defer tunnel.Close()
 	original := &Message{Name: "echo", Payload: []byte{10}}
 	count := 0
-	amount := 1
+	amount := 1000
 	var wg sync.WaitGroup
 	for i := 0; i < amount; i++ {
 		wg.Add(1)

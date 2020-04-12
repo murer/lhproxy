@@ -68,7 +68,6 @@ func (me *Tunnel) send() {
 			idxnil = idx
 		}
 	}
-	log.Printf("YYYYY %d", idxnil)
 	if idxnil == 0 {
 		log.Printf("Message nil found, stopping...")
 		me.mutex.Broadcast()
@@ -120,50 +119,44 @@ func aaaa(r io.Reader) int {
 }
 
 func handleTunnel(w http.ResponseWriter, r *http.Request) {
-	total := aaaa(r.Body)
-	b := util.NewBinary([]byte{})
-	b.WriteUInt16(uint16(total))
+	data := util.ReadAll(r.Body)
+	breq := util.NewBinary(data)
+	total := int(breq.ReadUInt16())
+	bresp := util.NewBinary([]byte{})
+	bresp.WriteUInt16(uint16(total))
 	for i := 0; i < total; i++ {
-		l := aaaa(r.Body)
-		data := util.ReadFully(r.Body, l)
-		msg := rawMessageDec(data)
-		log.Printf("RRRR %#v", msg)
-		ret := HandleMessage(msg)
-		retm := rawMessageEnc(ret)
-		b.WriteUInt16(uint16(len(retm)))
-		b.WriteBytes(retm)
-		log.Printf("Writing ret: %d", i)
-		w.Write(b.Bytes())
-		b = util.NewBinary([]byte{})
+		raw := breq.ReadBytes()
+		mreq := rawMessageDec(raw)
+		mresp := HandleMessage(mreq)
+		raw = rawMessageEnc(mresp)
+		bresp.WriteBytes(raw)
 	}
+	w.Write(bresp.Bytes())
 }
 
 func (me *Tunnel) post(max int) {
 	pipein, pipeout := io.Pipe()
 	go func() {
 		defer pipeout.Close()
-		log.Printf("Writing messagesss: %d", max)
 		b := util.NewBinary([]byte{})
 		b.WriteUInt16(uint16(max))
-		for idx, rpl := range me.msgs[:max] {
+		for _, rpl := range me.msgs[:max] {
 			if rpl == nil {
 				return
 			}
 			b.WriteBytes(rawMessageEnc(rpl.req))
-			log.Printf("Writing message: %d", idx)
 			pipeout.Write(b.Bytes())
 			b = util.NewBinary([]byte{})
 		}
 	}()
 	resp, err := http.Post(me.URL, "application/octet-stream", pipein)
 	util.Check(err)
-	total := aaaa(resp.Body)
+	data := util.ReadAll(resp.Body)
+	b := util.NewBinary(data)
+	total := int(b.ReadUInt16())
 	for i := 0; i < total; i++ {
-		l := aaaa(resp.Body)
-		log.Printf("IIII2 %d", l)
-		data := util.ReadFully(resp.Body, l)
-		msg := rawMessageDec(data)
-		log.Printf("RRRR222 %#v", msg)
+		raw := b.ReadBytes()
+		msg := rawMessageDec(raw)
 		me.msgs[i].resp = msg
 	}
 
