@@ -1,11 +1,11 @@
 package server
 
 import (
-	"log"
+	"github.com/murer/lhproxy/util"
 	"io"
+	"log"
 	"net/http"
 	"sync"
-	"github.com/murer/lhproxy/util"
 )
 
 const MSG_MAX = 20

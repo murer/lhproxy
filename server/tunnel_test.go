@@ -1,11 +1,11 @@
 package server
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"sync"
-	"fmt"
 	"testing"
 )
 
