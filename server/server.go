@@ -31,8 +31,8 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(util.Version))
 	} else if strings.HasPrefix(r.URL.Path, "/self/") {
 		handleSelf(w, r)
-		// } else if strings.HasPrefix(r.URL.Path, "/tunnel/") {
-		// 	handleTunnel(w, r)
+	} else if strings.HasPrefix(r.URL.Path, "/tunnel") {
+		handleTunnel(w, r)
 	} else if r.Method == "POST" {
 		HandleSockets(w, r)
 	} else {
@@ -63,6 +63,8 @@ func HandleMessage(req *Message) *Message {
 		return HandleMessageRead(req)
 	} else if req.Name == "scks/close" {
 		return HandleMessageClose(req)
+	} else if req.Name == "echo" {
+		return req
 	} else {
 		log.Panicf("Unknown message %s", req.Name)
 	}

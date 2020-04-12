@@ -2,7 +2,10 @@ package server
 
 import (
 	"log"
+	"io"
+	"net/http"
 	"sync"
+	"github.com/murer/lhproxy/util"
 )
 
 const MSG_MAX = 20
@@ -59,20 +62,31 @@ func (me *Tunnel) send() {
 	for len(me.msgs) <= 0 {
 		me.mutex.Wait()
 	}
-	// log.Printf("Posting messages: %d", len(me.msgs))
-	if me.msgs[0] == nil {
+	idxnil := -1
+	for idx, rpl := range me.msgs {
+		if rpl == nil {
+			idxnil = idx
+		}
+	}
+	log.Printf("YYYYY %d", idxnil)
+	if idxnil == 0 {
 		log.Printf("Message nil found, stopping...")
 		me.mutex.Broadcast()
 		me.closed = true
 		return
 	}
-	me.post()
-	for _, rpl := range me.msgs {
-		if rpl == nil {
-			break
-		}
-		rpl.resp = rpl.req
+	if idxnil < 0 {
+		idxnil = len(me.msgs)
 	}
+	if idxnil >= 0 {
+		me.post(idxnil)
+	}
+	// for _, rpl := range me.msgs {
+	// 	if rpl == nil {
+	// 		break
+	// 	}
+	// 	rpl.resp = rpl.req
+	// }
 	me.msgs = me.msgs[:0]
 	me.mutex.Broadcast()
 }
@@ -99,12 +113,60 @@ func (me *Tunnel) Close() error {
 	return nil
 }
 
-func (me *Tunnel) post() {
+func aaaa(r io.Reader) int {
+	buf := util.ReadFully(r, 2)
+	b := util.NewBinary(buf)
+	return int(b.ReadUInt16())
+}
+
+func handleTunnel(w http.ResponseWriter, r *http.Request) {
+	total := aaaa(r.Body)
+	b := util.NewBinary([]byte{})
+	b.WriteUInt16(uint16(total))
+	for i := 0; i < total; i++ {
+		l := aaaa(r.Body)
+		data := util.ReadFully(r.Body, l)
+		msg := rawMessageDec(data)
+		log.Printf("RRRR %#v", msg)
+		ret := HandleMessage(msg)
+		retm := rawMessageEnc(ret)
+		b.WriteUInt16(uint16(len(retm)))
+		b.WriteBytes(retm)
+		log.Printf("Writing ret: %d", i)
+		w.Write(b.Bytes())
+		b = util.NewBinary([]byte{})
+	}
+}
+
+func (me *Tunnel) post(max int) {
 	pipein, pipeout := io.Pipe()
 	go func() {
-		pipeout.Write([]byte{5, 6})
+		defer pipeout.Close()
+		log.Printf("Writing messagesss: %d", max)
+		b := util.NewBinary([]byte{})
+		b.WriteUInt16(uint16(max))
+		for idx, rpl := range me.msgs[:max] {
+			if rpl == nil {
+				return
+			}
+			b.WriteBytes(rawMessageEnc(rpl.req))
+			log.Printf("Writing message: %d", idx)
+			pipeout.Write(b.Bytes())
+			b = util.NewBinary([]byte{})
+		}
 	}()
-	http.Post(me.url, "application/octet-stream", pipein)
+	resp, err := http.Post(me.URL, "application/octet-stream", pipein)
+	util.Check(err)
+	total := aaaa(resp.Body)
+	for i := 0; i < total; i++ {
+		l := aaaa(resp.Body)
+		log.Printf("IIII2 %d", l)
+		data := util.ReadFully(resp.Body, l)
+		msg := rawMessageDec(data)
+		log.Printf("RRRR222 %#v", msg)
+		me.msgs[i].resp = msg
+	}
+
 }
 
 type Reader struct{}
