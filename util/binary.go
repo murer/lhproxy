@@ -3,8 +3,8 @@ package util
 import (
 	"bytes"
 	"encoding/binary"
-	"log"
 	"io"
+	"log"
 )
 
 func NewBinary(data []byte) *Binary {
@@ -24,7 +24,7 @@ func NewBinaryWriter(w io.Writer) *Binary {
 }
 
 func NewBinaryReadWriter(rw io.ReadWriter) *Binary {
-	return &Binary{reader:rw, writer:rw}
+	return &Binary{reader: rw, writer: rw}
 }
 
 type Binary struct {
