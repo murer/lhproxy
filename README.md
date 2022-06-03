@@ -2,6 +2,10 @@
 
 **LastHopeProxy** is a encrypted port forward through HTTP
 
+It is nice when you need to bypass proxy that decrypt your HTTPS.
+
+Some companies apply this technique (HTTPS decryption) on their employees.
+
 For **Linux**, **Windows** and **Mac**
 
 [![Build Status](https://travis-ci.org/murer/lhproxy.svg?branch=master)](https://travis-ci.org/murer/lhproxy)
