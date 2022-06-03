@@ -21,22 +21,22 @@ For **Linux**, **Windows** and **Mac**
  +-----+-----------------+   or whatever            |       
        |                                            |       
        |                          +-----------------+-----+
-       |                          |      Unreachable      |
-       |                          |         SERVER        |
+       |                          |    Server you want    |
+       |                          |        to access      |
        |                          |                       |
-       |                          +-----------+-----------+
-       | The forwarded HTTP                   |             
-       | request/response with                |             
-       | a bunch of unreadable                              
-       | binary data inside                Impossible       
-       |                                     Path           
-       |                                                    
-       |                                      |             
-       |     +-----------------------+        |             
-       |     | A Very Boring Firwall |        |             
-       +-----+       or Proxy        +--------+             
-             |                       |                      
-             +-----------+-----------+                      
+       |                          +-------------+---------+
+       | The forwarded HTTP                     |             
+       | request/response with                  |             
+       | a bunch of unreadable                =====            
+       | binary data inside                 Impossible       
+       |                                       Path           
+       |                                      =====            
+       |                                        |             
+       |     +-------------------------+        |             
+       |     |   Firwall or Proxy      |        |
+       +-----+ limiting and decrypting +--------+             
+             |          you            |                      
+             +-----------+-------------+                      
   POST http://lhproxy/   |                                  
   Encrypted Request Body |                                  
                          |                                  
