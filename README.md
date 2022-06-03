@@ -6,6 +6,8 @@ It is nice when you need to bypass proxy that decrypt your HTTPS.
 
 Some companies apply this technique (HTTPS decryption) on their employees.
 
+So, we are going to create a encrypted tunnel over plain HTTP.
+
 For **Linux**, **Windows** and **Mac**
 
 [![Build Status](https://travis-ci.org/murer/lhproxy.svg?branch=master)](https://travis-ci.org/murer/lhproxy)
