@@ -16,15 +16,15 @@ For **Linux**, **Windows** and **Mac**
 ```
  +-----------------------+   The real connection            
  |        LHProxy        |   from YOU to the SERVER         
- |    Last Hope Proxy    ---------------------------+       
+ |    Last Hope Proxy    +--------------------------+       
  |                       |   Maybe SSH, IRC, HTTP   |       
- +-----|-----------------+   or whatever            |       
+ +-----+-----------------+   or whatever            |       
        |                                            |       
-       |                          +-----------------|-----+
+       |                          +-----------------+-----+
        |                          |      Unreachable      |
        |                          |         SERVER        |
        |                          |                       |
-       |                          +-----------|-----------+
+       |                          +-----------+-----------+
        | The forwarded HTTP                   |             
        | request/response with                |             
        | a bunch of unreadable                              
@@ -34,16 +34,16 @@ For **Linux**, **Windows** and **Mac**
        |                                      |             
        |     +-----------------------+        |             
        |     | A Very Boring Firwall |        |             
-       +------       or Proxy        ---------+             
+       +-----+       or Proxy        +--------+             
              |                       |                      
-             +-----------|-----------+                      
+             +-----------+-----------+                      
   POST http://lhproxy/   |                                  
   Encrypted Request Body |                                  
                          |                                  
   200 OK HTTP/1.1        |                                  
   Encrypted Reponse Body |                                  
                          |                                  
-             +-----------|-----------+                      
+             +-----------+-----------+                      
              |          YOU          |                      
              |       the Client      |                      
              |                       |                      
